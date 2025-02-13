@@ -27,7 +27,7 @@ public class WordService implements IWordService {
     private final WordRepository wordRepository;
     private final CategoryRepository categoryRepository;
     private final EnglishWordRepository englishWordRepository;
-    private final ModelMapper modelMapper;
+//    private final ModelMapper modelMapper;
 
     @Override
     public WordDto addWord(AddWordRequest request) {
@@ -189,36 +189,36 @@ public class WordService implements IWordService {
         return words.stream().map(this::convertWordToDto).collect(Collectors.toList());
     }
 
-//    @Override
-//    public List<Word> getWordsByEnglishWordAndCategory(String englishWord, String category) {
-//        if (! categoryRepository.existsByName(category)){
-//            throw new CategoryNotFoundException("No category with name " + category + " found.");
-//        }
-//        if(! wordRepository.existsByEnglishWord(englishWord)){
-//            throw new WordNotFoundException("No word with English " + englishWord + " found.");
-//        }
-//
-//        List<Word> words = wordRepository.findByEnglishWord(englishWord);
-//        if (words.isEmpty()){
-//            // this should return 200 empty status?
-//            throw new WordNotFoundException("No words with the English " + englishWord + " have been found. Please try again.");
-//        }
-//        List<Word> filteredWords = new ArrayList<>();
-//        for (Word word : words){
-//            Collection<Category> categories = word.getCategory();
-//            for (Category givenCategory : categories){
-//                if(givenCategory.getName().contains(category)){
-//                    filteredWords.add(word);
-//                    break;
-//                }
-//            }
-//        }
-//        if (filteredWords.isEmpty()){
-//            // this should return 200 empty status?
-//            throw new WordNotFoundException("No words with the English " + englishWord + " and category " + category + " have been found. Please add some words to this category and try again.");
-//        }
-//        return filteredWords;
-//    }
+    @Override
+    public List<WordDto> getWordsByEnglishWordAndCategory(String englishWord, String category) {
+        if (! categoryRepository.existsByName(category)){
+            throw new CategoryNotFoundException("No category with name '" + category + "' found. Please try again.");
+        }
+        if(! englishWordRepository.existsByEnglishWord(englishWord)){
+            throw new WordNotFoundException("No English word '" + englishWord + "' found. Please try again.");
+        }
+        // Get words by English word
+        List<Word> words = wordRepository.findBySingleEnglishWord(englishWord);
+        if (words.isEmpty()){
+            // this should return 200 empty status?
+            throw new WordNotFoundException("No words matching '" + englishWord + "' have been found. Please try again.");
+        }
+        List<Word> filteredWords = new ArrayList<>();
+        for (Word word : words){
+            Collection<Category> categories = word.getCategory();
+            for (Category givenCategory : categories){
+                if(givenCategory.getName().contains(category)){
+                    filteredWords.add(word);
+                    break;
+                }
+            }
+        }
+        if (filteredWords.isEmpty()){
+            // this should return 200 empty status?
+            throw new WordNotFoundException("No words matching '" + englishWord + "' and category '" + category + "' have been found.");
+        }
+        return filteredWords.stream().map(this::convertWordToDto).collect(Collectors.toList());
+    }
 
 //    @Override
 //    public List<Word> getWordsByJapaneseWordAndCategory(String japaneseWord, String category) {

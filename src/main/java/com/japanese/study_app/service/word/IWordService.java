@@ -23,7 +23,7 @@ public interface IWordService {
     List<WordDto> getWordsByHiragana(String hiragana);
     List<WordDto> getWordsByCategory(String category);
     List<WordDto> getWordsByEnglishWord(String englishWord);
-//    List<Word> getWordsByEnglishWordAndCategory(String englishWord, String category);
+    List<WordDto> getWordsByEnglishWordAndCategory(String englishWord, String category);
 
     //    List<Word> getWordsByEnglishWordAndCategory(String englishWord, String category);
 //    List<Word> getWordsByJapaneseWordAndCategory(String japaneseWord, String category);

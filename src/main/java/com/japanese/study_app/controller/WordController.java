@@ -109,6 +109,16 @@ public class WordController {
             return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new ApiResponse("Failed to find words.", INTERNAL_SERVER_ERROR));
         }
     }
+
+    @GetMapping("/english/{english}/category/{category}")
+    public ResponseEntity<ApiResponse> getWordsByEnglishWordAndCategory(@PathVariable String english, @PathVariable String category) {
+        try {
+            List<WordDto> words = wordService.getWordsByEnglishWordAndCategory(english, category);
+            return ResponseEntity.ok(new ApiResponse("Words matching English '" + english + " and category '" + category + "' retrieved successfully.", words));
+        } catch (Exception e) {
+            return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new ApiResponse("Failed to find words.", INTERNAL_SERVER_ERROR));
+        }
+    }
     
 
 }
