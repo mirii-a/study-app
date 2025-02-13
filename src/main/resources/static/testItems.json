@@ -28,3 +28,15 @@
   "hiragana": "おおう",
   "category": ["verb", "hide"]
 }
+{
+"japaneseWord": "波",
+"englishWord": ["wave", "ups and downs"],
+"hiragana": "なみ",
+"category": ["noun", "sea", "ocean"]
+}
+{
+"japaneseWord": "並",
+"englishWord": ["average", "medium", "common", "ordinary", "mid-grade", "same level as", "equal to", "each", "every"],
+"hiragana": "なみ",
+"category": ["noun", "suffix", "descriptive"]
+}
