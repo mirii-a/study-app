@@ -76,7 +76,7 @@ public class WordController {
             List<WordDto> words = wordService.getWordsByHiragana(hiragana);
             return ResponseEntity.ok(new ApiResponse("Words with hiragana '" + hiragana + "' retrieved successfully.", words));
         } catch (Exception e) {
-            return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new ApiResponse("Failed to find words.", INTERNAL_SERVER_ERROR));
+            return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new ApiResponse("Failed to find words matching given criteria.", INTERNAL_SERVER_ERROR));
         }
     }
 
@@ -86,7 +86,7 @@ public class WordController {
             WordDto word = wordService.getWordByJapaneseWord(kanji);
             return ResponseEntity.ok(new ApiResponse("Word with kanji '" + kanji + "' retrieved successfully.", word));
         } catch (Exception e) {
-            return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new ApiResponse("Failed to find words.", INTERNAL_SERVER_ERROR));
+            return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new ApiResponse("Failed to find words matching given criteria.", INTERNAL_SERVER_ERROR));
         }
     }
 
@@ -96,7 +96,7 @@ public class WordController {
             List<WordDto> word = wordService.getWordsByEnglishWord(english);
             return ResponseEntity.ok(new ApiResponse("Words with English translation '" + english + "' retrieved successfully.", word));
         } catch (Exception e) {
-            return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new ApiResponse("Failed to find words.", INTERNAL_SERVER_ERROR));
+            return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new ApiResponse("Failed to find words matching given criteria.", INTERNAL_SERVER_ERROR));
         }
     }
 
@@ -106,7 +106,7 @@ public class WordController {
             List<WordDto> word = wordService.getWordsByCategory(category);
             return ResponseEntity.ok(new ApiResponse("Words with category '" + category + "' retrieved successfully.", word));
         } catch (Exception e) {
-            return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new ApiResponse("Failed to find words.", INTERNAL_SERVER_ERROR));
+            return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new ApiResponse("Failed to find words matching given criteria.", INTERNAL_SERVER_ERROR));
         }
     }
 
@@ -116,7 +116,17 @@ public class WordController {
             List<WordDto> words = wordService.getWordsByEnglishWordAndCategory(english, category);
             return ResponseEntity.ok(new ApiResponse("Words matching English '" + english + " and category '" + category + "' retrieved successfully.", words));
         } catch (Exception e) {
-            return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new ApiResponse("Failed to find words.", INTERNAL_SERVER_ERROR));
+            return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new ApiResponse("Failed to find words matching given criteria.", INTERNAL_SERVER_ERROR));
+        }
+    }
+
+    @GetMapping("/hiragana/{hiragana}/category/{category}")
+    public ResponseEntity<ApiResponse> getWordsByHiraganaAndCategory(@PathVariable String hiragana, @PathVariable String category) {
+        try {
+            List<WordDto> words = wordService.getWordsByHiraganaAndCategory(hiragana, category);
+            return ResponseEntity.ok(new ApiResponse("Words matching hiragana '" + hiragana + " and category '" + category + "' retrieved successfully.", words));
+        } catch (Exception e) {
+            return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new ApiResponse("Failed to find words matching given criteria.", INTERNAL_SERVER_ERROR));
         }
     }
     

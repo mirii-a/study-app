@@ -16,11 +16,7 @@ public interface WordRepository extends JpaRepository<Word, Long>{
     List<Word> findByHiragana(String hiragana);
     // List<Word> findByExampleSentences(String exampleSentence);
     // List<Word> findByDefinitions(String definition);
-//    List<Word> findByEnglishWordAndCategoryName(List<String> englishWord, String category);
-//    List<Word> findByJapaneseWordAndCategoryName(String japaneseWord, String category);
 
-    // Long countByBrandAndName(String brand, String name);
-//    boolean existsByJapaneseWordAndEnglishWord(String japaneseWord, List<String> englishWord);
 //    boolean existsByEnglishWord(String englishWord);
     boolean existsByJapaneseWord(String japaneseWord);
 }

@@ -190,9 +190,34 @@ public class WordService implements IWordService {
     }
 
     @Override
+    public List<WordDto> getWordsByHiraganaAndCategory(String hiragana, String category){
+        // search if category exists
+        if (!categoryRepository.existsByName(category)){
+            throw new CategoryNotFoundException("No category with name " + category + " found.");
+        }
+        // search if hiragana exists
+        List<Word> wordsWithHiragana = wordRepository.findByHiragana(hiragana);
+        if (wordsWithHiragana.isEmpty()){
+            throw new WordNotFoundException("No words with hiragana '" + hiragana + "' have been found.");
+        }
+        // combine searches
+        List<Word> filteredWords = new ArrayList<>();
+        wordsWithHiragana.forEach(word -> {
+            Collection<Category> categories = word.getCategory();
+            for (Category givenCategory : categories){
+                if(givenCategory.getName().equals(category)){
+                    filteredWords.add(word);
+                }
+            }
+        });
+
+        return filteredWords.stream().map(this::convertWordToDto).collect(Collectors.toList());
+    }
+
+    @Override
     public List<WordDto> getWordsByEnglishWordAndCategory(String englishWord, String category) {
         if (! categoryRepository.existsByName(category)){
-            throw new CategoryNotFoundException("No category with name '" + category + "' found. Please try again.");
+            throw new CategoryNotFoundException("No category with name '" + category + "' found.");
         }
         if(! englishWordRepository.existsByEnglishWord(englishWord)){
             throw new WordNotFoundException("No English word '" + englishWord + "' found. Please try again.");
@@ -219,23 +244,6 @@ public class WordService implements IWordService {
         }
         return filteredWords.stream().map(this::convertWordToDto).collect(Collectors.toList());
     }
-
-//    @Override
-//    public List<Word> getWordsByJapaneseWordAndCategory(String japaneseWord, String category) {
-//        if (! categoryRepository.existsByName(category)){
-//            throw new CategoryNotFoundException("No category with name " + category + " found.");
-//        }
-//        if(! wordRepository.existsByJapaneseWord(japaneseWord)){
-//            throw new WordNotFoundException("No word with Japanese " + japaneseWord + " found.");
-//        }
-//
-//        List<Word> words = wordRepository.findByJapaneseWordAndCategoryName(japaneseWord, category);
-//        if (words.isEmpty()){
-//            // this should return 200 empty status?
-//            throw new WordNotFoundException("No words with the Japanese " + japaneseWord + " and category " + category + " have been found. Please add some words to this category and try again.");
-//        }
-//        return words;
-//    }
 
     @Override
     public List<WordDto> getAllWords() {

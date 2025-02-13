@@ -24,10 +24,7 @@ public interface IWordService {
     List<WordDto> getWordsByCategory(String category);
     List<WordDto> getWordsByEnglishWord(String englishWord);
     List<WordDto> getWordsByEnglishWordAndCategory(String englishWord, String category);
-
-    //    List<Word> getWordsByEnglishWordAndCategory(String englishWord, String category);
-//    List<Word> getWordsByJapaneseWordAndCategory(String japaneseWord, String category);
-
+    List<WordDto> getWordsByHiraganaAndCategory(String hiragana, String category);
 //    List<WordDto> getConvertedProducts(List<Word> words);
 
     WordDto convertWordToDto(Word word);
