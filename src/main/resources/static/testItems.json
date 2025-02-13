@@ -1,0 +1,30 @@
+{
+  "japaneseWord": "寓意的",
+  "englishWord": [
+    "allegorical",
+    "emblematic"
+  ],
+  "hiragana": "ぐういてき",
+  "category": [
+    "adj",
+    "art"
+  ]
+},
+{
+  "japaneseWord": "人造",
+  "englishWord": ["artificial", "man-made", "synthetic"],
+  "hiragana": "じんぞう",
+  "category": ["adj", "production"]
+},
+{
+  "japaneseWord": "隠れる",
+  "englishWord": ["to hide", "to conceal oneself", "to disappear (behind)", "to be hidden (by)", "to be unknown (talent)", "to be hidden (meaning)"],
+  "hiragana": "かくれる",
+  "category": ["verb", "hide"]
+},
+{
+  "japaneseWord": "覆う",
+  "englishWord": ["to cover", "to hide", "to conceal", "to disguise", "to wrap"],
+  "hiragana": "おおう",
+  "category": ["verb", "hide"]
+}
