@@ -136,9 +136,11 @@ public class WordService implements IWordService {
 
     @Override
     public void deleteWordByJapaneseWord(String japaneseWord) {
-        // wordRepository::delete is a method reference that refers to the delete method of the wordRepository
-//        wordRepository.findByJapaneseWord(japaneseWord)
-//                .ifPresentOrElse(wordRepository::delete, () -> {throw new WordNotFoundException("Word not found to delete!");});
+        if (wordExists(japaneseWord)){
+            Word word = wordRepository.findByJapaneseWord(japaneseWord);
+            wordRepository.delete(word);
+        }
+        throw new WordNotFoundException("Word not found to delete!");
     }
 
     @Override

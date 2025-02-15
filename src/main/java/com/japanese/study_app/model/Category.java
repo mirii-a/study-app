@@ -30,7 +30,8 @@ public class Category {
     private String name;
 
     @JsonIgnore
-    @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    @ManyToMany(fetch = FetchType.EAGER,
+            cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinTable(name = "categories_for_words", joinColumns = @JoinColumn(name = "category_id", referencedColumnName = "id"), 
         inverseJoinColumns = @JoinColumn(name = "word_id", referencedColumnName = "id")
     )
