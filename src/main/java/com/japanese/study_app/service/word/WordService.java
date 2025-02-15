@@ -6,7 +6,6 @@ import java.util.stream.Collectors;
 import com.japanese.study_app.dto.WordDto;
 import com.japanese.study_app.model.EnglishWord;
 import com.japanese.study_app.repository.EnglishWordRepository;
-import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import com.japanese.study_app.exceptions.AlreadyExistsException;

@@ -3,23 +3,18 @@ package com.japanese.study_app.controller;
 import com.japanese.study_app.dto.WordDto;
 import com.japanese.study_app.exceptions.AlreadyExistsException;
 import com.japanese.study_app.exceptions.WordNotFoundException;
-import org.springframework.web.bind.annotation.*;
-
-import com.japanese.study_app.model.Word;
 import com.japanese.study_app.request.AddWordRequest;
 import com.japanese.study_app.response.ApiResponse;
 import com.japanese.study_app.service.word.IWordService;
 
 import lombok.RequiredArgsConstructor;
 
-import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
-
 import static org.springframework.http.HttpStatus.CONFLICT;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
-
 
 
 @RequiredArgsConstructor
