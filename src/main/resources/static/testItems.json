@@ -40,3 +40,27 @@
 "hiragana": "なみ",
 "category": ["noun", "suffix", "descriptive"]
 }
+{
+"japaneseWord": "認める",
+"englishWord": ["to recognise", "to observe", "to notice", "to deem", "to judge", "to assess", "to approve", "to deem acceptable", "to allow"],
+"hiragana": "みとめる",
+"category": ["verb"]
+}
+{
+"japaneseWord": "纏める",
+"englishWord": ["to collect", "to put (it all) together", "to integrate", "to consolidate", "to unify", "to summarise", "to aggregate", "to bring to a conclusion", "to finalise", "to settle", "to put in order"],
+"hiragana": "まとめる",
+"category": ["verb"]
+}
+{
+"japaneseWord": "求める",
+"englishWord": ["to want", "to wish for", "to request", "to demand", "to require", "to ask for", "to seek", "to search for", "to look for", "to pursue (pleasure)", "to hunt (a job)", "to find (a solution)"],
+"hiragana": "もとめる",
+"category": ["verb"]
+}
+{
+"japaneseWord": "依頼(する)",
+"englishWord": ["to request", "to commission", "to entrust (with a matter)", "to depend on", "to rely on", "dependence", "reliance"],
+"hiragana": "いらい",
+"category": ["verb", "noun", "transitive", "intransitive"]
+}
