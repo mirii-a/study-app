@@ -10,7 +10,7 @@ public interface IWordService {
 
     WordDto addWord(AddWordRequest request);
 
-    Word getWordById(Long id);
+    WordDto getWordById(Long id);
     void deleteWordById(Long id);
     void deleteWordByJapaneseWord(String japaneseWord);
     Word updateWord();
@@ -25,7 +25,6 @@ public interface IWordService {
     List<WordDto> getWordsByEnglishWord(String englishWord);
     List<WordDto> getWordsByEnglishWordAndCategory(String englishWord, String category);
     List<WordDto> getWordsByHiraganaAndCategory(String hiragana, String category);
-//    List<WordDto> getConvertedProducts(List<Word> words);
 
     WordDto convertWordToDto(Word word);
 

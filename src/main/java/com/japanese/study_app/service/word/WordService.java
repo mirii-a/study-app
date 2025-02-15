@@ -123,8 +123,8 @@ public class WordService implements IWordService {
     }
     
     @Override
-    public Word getWordById(Long id) {
-        return wordRepository.findById(id)
+    public WordDto getWordById(Long id) {
+        return wordRepository.findById(id).map(this::convertWordToDto)
             .orElseThrow(() -> new WordNotFoundException("Word not found!"));
     }
 

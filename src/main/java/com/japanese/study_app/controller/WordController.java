@@ -129,6 +129,16 @@ public class WordController {
             return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new ApiResponse("Failed to find words matching given criteria.", INTERNAL_SERVER_ERROR));
         }
     }
+
+    @GetMapping("/id/{id}")
+    public ResponseEntity<ApiResponse> getWordsById(@PathVariable Long id) {
+        try {
+            WordDto word = wordService.getWordById(id);
+            return ResponseEntity.ok(new ApiResponse("Word with id " + id + " retrieved successfully.", word));
+        } catch (Exception e) {
+            return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new ApiResponse("Failed to find words matching given criteria.", INTERNAL_SERVER_ERROR));
+        }
+    }
     
 
 }
