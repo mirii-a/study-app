@@ -55,10 +55,10 @@ public class WordController {
         }
     }
 
-    @DeleteMapping("/delete/word/{word}")
-    public ResponseEntity<ApiResponse> deleteWordByJapaneseWord(@PathVariable String japanese) {
+    @DeleteMapping("/delete/word/{kanji}")
+    public ResponseEntity<ApiResponse> deleteWordByJapaneseWord(@PathVariable String kanji) {
         try{
-            wordService.deleteWordByJapaneseWord(japanese);
+            wordService.deleteWordByJapaneseWord(kanji);
             return ResponseEntity.ok(new ApiResponse("Word deleted successfully.", null));
         } catch(WordNotFoundException e){
             return ResponseEntity.status(CONFLICT).body(new ApiResponse(e.getMessage(), null));

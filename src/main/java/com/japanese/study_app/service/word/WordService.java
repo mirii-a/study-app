@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import com.japanese.study_app.dto.WordDto;
 import com.japanese.study_app.model.EnglishWord;
 import com.japanese.study_app.repository.EnglishWordRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import com.japanese.study_app.exceptions.AlreadyExistsException;
@@ -135,12 +136,26 @@ public class WordService implements IWordService {
     }
 
     @Override
+    @Transactional
     public void deleteWordByJapaneseWord(String japaneseWord) {
-        if (wordExists(japaneseWord)){
+        if (wordExists(japaneseWord)) {
             Word word = wordRepository.findByJapaneseWord(japaneseWord);
-            wordRepository.delete(word);
+            for (Category category : word.getCategory()){
+                Collection<Word> wordsForCategory = category.getWords();
+                wordsForCategory.removeIf(wordInCategory -> wordInCategory.getJapaneseWord().equals(word.getJapaneseWord()));
+                category.setWords(wordsForCategory);
+                categoryRepository.save(category);
+            }
+            for (EnglishWord english : word.getEnglishWord()){
+                Collection<Word> wordsForEnglishWord = english.getWord();
+                wordsForEnglishWord.removeIf(matchingWord -> matchingWord.getEnglishWord().equals(word.getEnglishWord()));
+                english.setWord(wordsForEnglishWord);
+                englishWordRepository.save(english);
+            }
+            wordRepository.findById(word.getId()).ifPresentOrElse(wordRepository::delete, () -> {throw new WordNotFoundException("Word not found to delete!");});
+        } else {
+            throw new WordNotFoundException("Word not found to delete!");
         }
-        throw new WordNotFoundException("Word not found to delete!");
     }
 
     @Override
