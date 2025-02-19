@@ -5,7 +5,9 @@ import java.util.stream.Collectors;
 
 import com.japanese.study_app.dto.WordDto;
 import com.japanese.study_app.model.EnglishWord;
+import com.japanese.study_app.model.WordDefinition;
 import com.japanese.study_app.repository.EnglishWordRepository;
+import com.japanese.study_app.repository.WordDefinitionRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +29,7 @@ public class WordService implements IWordService {
     private final WordRepository wordRepository;
     private final CategoryRepository categoryRepository;
     private final EnglishWordRepository englishWordRepository;
+    private final WordDefinitionRepository wordDefinitionRepository;
 //    private final ModelMapper modelMapper;
 
     @Override
@@ -60,6 +63,8 @@ public class WordService implements IWordService {
             category.setWords(words);
             categoryRepository.save(category);
         });
+
+        dealWithDefinitions(newWord, request);
 
         return convertWordToDto(newWord);
     }
@@ -120,6 +125,41 @@ public class WordService implements IWordService {
             }
         });
         return categories;
+    }
+
+    private void dealWithDefinitions(Word word, AddWordRequest request){
+        // updates the Word object so no need to return anything here
+
+        Map<String, Set<String>> definitions = request.getDefinitions();
+        WordDefinition wordDefinition = new WordDefinition();
+
+        // Get Japanese definitions and make them into one string
+        StringBuilder japaneseDefinitionStringBuilder = new StringBuilder();
+
+        for (String japaneseDefinition : definitions.get("japanese")){
+            japaneseDefinitionStringBuilder.append(japaneseDefinition).append(";");
+        }
+
+        String japaneseDefinitions = japaneseDefinitionStringBuilder.toString();
+        wordDefinition.setDefinitionJapanese(japaneseDefinitions);
+
+        // Get English definitions and make them into one string
+        StringBuilder englishDefinitionStringBuilder = new StringBuilder();
+
+        for (String englishDefinition : definitions.get("english")){
+            englishDefinitionStringBuilder.append(englishDefinition).append(";");
+        }
+
+        String englishDefinitions = englishDefinitionStringBuilder.toString();
+        wordDefinition.setDefinitionEnglish(englishDefinitions);
+
+        wordDefinition.setWord(word);
+
+        wordDefinitionRepository.save(wordDefinition);
+
+        List<WordDefinition> wordDefinitionsForWord = wordDefinitionRepository.findByWord(word);
+        word.setDefinitions(wordDefinitionsForWord);
+
     }
     
     @Override
