@@ -1,22 +1,32 @@
-// package com.japanese.study_app.model;
+ package com.japanese.study_app.model;
 
-// import jakarta.persistence.Entity;
-// import jakarta.persistence.GeneratedValue;
-// import jakarta.persistence.GenerationType;
-// import jakarta.persistence.Id;
-// import jakarta.persistence.JoinColumn;
-// import jakarta.persistence.ManyToOne;
+ import jakarta.persistence.Entity;
+ import jakarta.persistence.GeneratedValue;
+ import jakarta.persistence.GenerationType;
+ import jakarta.persistence.Id;
+ import jakarta.persistence.JoinColumn;
+ import jakarta.persistence.ManyToOne;
+ import lombok.AllArgsConstructor;
+ import lombok.Getter;
+ import lombok.NoArgsConstructor;
+ import lombok.Setter;
 
-// @Entity
-// public class WordDefinition {
-//     @Id
-//     @GeneratedValue(strategy = GenerationType.IDENTITY)
-//     private Long id;
+ import java.util.List;
 
-//     private String definitionJapanese;
-//     private String definitionEnglish;
+ @Entity
+ @Getter
+ @Setter
+ @AllArgsConstructor
+ @NoArgsConstructor
+ public class WordDefinition {
+     @Id
+     @GeneratedValue(strategy = GenerationType.IDENTITY)
+     private Long id;
 
-//     @ManyToOne
-//     @JoinColumn(name= "word_id")
-//     private Word word;
-// }
+     private String definitionJapanese;
+     private String definitionEnglish;
+
+     @ManyToOne
+     @JoinColumn(name= "word_id")
+     private Word word;
+ }

@@ -50,7 +50,11 @@
 "japaneseWord": "纏める",
 "englishWord": ["to collect", "to put (it all) together", "to integrate", "to consolidate", "to unify", "to summarise", "to aggregate", "to bring to a conclusion", "to finalise", "to settle", "to put in order"],
 "hiragana": "まとめる",
-"category": ["verb"]
+"category": ["verb"],
+"definitions": {
+  "english": ["a whole formed by combining several separate elements"],
+  "japanese": ["ばらばらなものを集めて一つにする、物事の筋道を整える、決まりをつける"]
+  }
 }
 {
 "japaneseWord": "求める",
