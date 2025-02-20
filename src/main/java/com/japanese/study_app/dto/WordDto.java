@@ -16,4 +16,6 @@ public class WordDto {
     private List<String> englishWord;
     private String hiragana;
     private List<String> categories;
+    private List<String> englishDefinitions;
+    private List<String> japaneseDefinitions;
 }
