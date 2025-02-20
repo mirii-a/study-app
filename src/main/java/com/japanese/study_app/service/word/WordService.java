@@ -128,38 +128,46 @@ public class WordService implements IWordService {
     }
 
     private void dealWithDefinitions(Word word, AddWordRequest request){
-        // updates the Word object so no need to return anything here
-
+        // Updates the Word object so no need to return anything
         Map<String, Set<String>> definitions = request.getDefinitions();
         WordDefinition wordDefinition = new WordDefinition();
 
-        // Get Japanese definitions and make them into one string
-        StringBuilder japaneseDefinitionStringBuilder = new StringBuilder();
+        if (definitions != null){
+            // Get Japanese definitions and make them into one string
+            StringBuilder japaneseDefinitionStringBuilder = new StringBuilder();
 
-        for (String japaneseDefinition : definitions.get("japanese")){
-            japaneseDefinitionStringBuilder.append(japaneseDefinition).append(";");
+            for (String japaneseDefinition : definitions.get("japanese")){
+                japaneseDefinitionStringBuilder.append(japaneseDefinition).append(";");
+            }
+
+            String japaneseDefinitions = japaneseDefinitionStringBuilder.toString();
+            wordDefinition.setDefinitionJapanese(japaneseDefinitions);
+
+            // Get English definitions and make them into one string
+            StringBuilder englishDefinitionStringBuilder = new StringBuilder();
+
+            for (String englishDefinition : definitions.get("english")){
+                englishDefinitionStringBuilder.append(englishDefinition).append(";");
+            }
+
+            String englishDefinitions = englishDefinitionStringBuilder.toString();
+            wordDefinition.setDefinitionEnglish(englishDefinitions);
+
+            wordDefinition.setWord(word);
+
+            wordDefinitionRepository.save(wordDefinition);
+
+            List<WordDefinition> wordDefinitionsForWord = wordDefinitionRepository.findByWord(word);
+            word.setDefinitions(wordDefinitionsForWord);
+        } else {
+            // Set as blank list as there are no definitions
+            // Nothing to save to the database
+            wordDefinition.setDefinitionEnglish("");
+            wordDefinition.setDefinitionJapanese("");
+            List<WordDefinition> blankList = new ArrayList<>();
+            blankList.add(wordDefinition);
+            word.setDefinitions(blankList);
         }
-
-        String japaneseDefinitions = japaneseDefinitionStringBuilder.toString();
-        wordDefinition.setDefinitionJapanese(japaneseDefinitions);
-
-        // Get English definitions and make them into one string
-        StringBuilder englishDefinitionStringBuilder = new StringBuilder();
-
-        for (String englishDefinition : definitions.get("english")){
-            englishDefinitionStringBuilder.append(englishDefinition).append(";");
-        }
-
-        String englishDefinitions = englishDefinitionStringBuilder.toString();
-        wordDefinition.setDefinitionEnglish(englishDefinitions);
-
-        wordDefinition.setWord(word);
-
-        wordDefinitionRepository.save(wordDefinition);
-
-        List<WordDefinition> wordDefinitionsForWord = wordDefinitionRepository.findByWord(word);
-        word.setDefinitions(wordDefinitionsForWord);
-
     }
     
     @Override
