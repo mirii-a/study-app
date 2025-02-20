@@ -1,13 +1,12 @@
 package com.japanese.study_app.request;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import com.japanese.study_app.model.Category;
 // import com.japanese.study_app.model.ExampleSentence;
- import com.japanese.study_app.model.WordDefinition;
 import com.japanese.study_app.model.EnglishWord;
+
 import lombok.Data;
 
 @Data
