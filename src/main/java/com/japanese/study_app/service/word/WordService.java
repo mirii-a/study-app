@@ -323,6 +323,28 @@ public class WordService implements IWordService {
         wordDto.setJapaneseWord(word.getJapaneseWord());
         wordDto.setHiragana(word.getHiragana());
         wordDto.setCategories(word.getCategory().stream().map(Category::getName).collect(Collectors.toList()));
+
+        if (word.getDefinitions() != null){
+            List<WordDefinition> definitionsForWord = word.getDefinitions();
+
+            List<String> allEnglishDefinitions = new ArrayList<>();
+            List<String> allJapaneseDefinitions = new ArrayList<>();
+
+            for (WordDefinition definition : definitionsForWord){
+                String[] englishDefinitions = definition.getDefinitionEnglish().split(";");
+                String[] japaneseDefinitions = definition.getDefinitionJapanese().split(";");
+
+                allEnglishDefinitions.addAll(Arrays.stream(englishDefinitions).toList());
+                allJapaneseDefinitions.addAll(Arrays.stream(japaneseDefinitions).toList());
+            }
+
+            wordDto.setEnglishDefinitions(allEnglishDefinitions);
+            wordDto.setJapaneseDefinitions(allJapaneseDefinitions);
+        } else {
+            List<String> blankList = new ArrayList<>();
+            wordDto.setEnglishDefinitions(blankList);
+            wordDto.setJapaneseDefinitions(blankList);
+        }
         return wordDto;
     }
 }
