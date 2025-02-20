@@ -44,7 +44,12 @@
 "japaneseWord": "認める",
 "englishWord": ["to recognise", "to observe", "to notice", "to deem", "to judge", "to assess", "to approve", "to deem acceptable", "to allow"],
 "hiragana": "みとめる",
-"category": ["verb"]
+"category": ["verb"],
+"definitions": {
+  "english": ["To allow, to approve, or to tolerate.","To notice something, to perceive its existence", "To see, think about it, and judge it to be so", "To accept what the other person says as fact"],
+  "japanese": ["かまわないとして許す。 承認する。 また、容認する。", "目にとめる、存在を知覚する", "相手の言葉をそのまま事実として受け止める", "見て、考えて確かにそうだと判断する"]
+  }
+}
 }
 {
 "japaneseWord": "纏める",
@@ -67,4 +72,44 @@
 "englishWord": ["to request", "to commission", "to entrust (with a matter)", "to depend on", "to rely on", "dependence", "reliance"],
 "hiragana": "いらい",
 "category": ["verb", "noun", "transitive", "intransitive"]
+}
+{
+"japaneseWord": "偏見",
+"englishWord": ["prejudice", "bias", "distorted view"],
+"hiragana": "へんけん",
+"category": ["noun", "opinion"],
+"definitions": {
+  "english": ["A biased view. An unfair opinion.", "A biased view or way of thinking. An unfavorable prejudice or judgment of a group or individual that is held without objective evidence."],
+  "japanese": ["偏った見解。中正でない意見。", "かたよった見方・考え方。ある集団や個人に対して、客観的な根拠なしにいだかれる非好意的な先入観や判断。"]
+  }
+}
+{
+"japaneseWord": "先入観",
+"englishWord": ["prejudice", "preconception", "preconceived notion"],
+"hiragana": "せんにゅうかん",
+"category": ["noun", "opinion"],
+"definitions": {
+  "english": ["Fixed ideas formed based on the first thing that is learned.", "A fixed idea that is held in advance. A preconceived notion that prevents free thought."],
+  "japanese": ["初めに知った事に基づいて作られた固定的な観念。", "前もっていだいている固定的な観念。それによって自由な思考が妨げられる場合にいう。先入見。先入主。"]
+  }
+}
+{
+"japaneseWord": "既成概念",
+"englishWord": ["stereotype", "preconception", "preconceived notion", "preconceived idea"],
+"hiragana": "きせいがいねん",
+"category": ["noun", "opinion"],
+"definitions": {
+  "english": ["A pre-established set of thoughts, values and preconceptions about something."],
+  "japanese": ["ある物事について、すでにできあがっている考えや価値観、認識の枠組み"]
+  }
+}
+{
+"japaneseWord": "固定観念",
+"englishWord": ["stereotype", "prejudice", "fixed idea"],
+"hiragana": "こていかんねん",
+"category": ["noun", "opinion"],
+"definitions": {
+  "english": ["An idea that is always stuck in one's head and restricts one's thinking", "A way of thinking in which certain ideas or values become rigid and restrict one's thinking"],
+  "japanese": ["いつも頭から離れないで、その人の思考を拘束するような考え", "特定の考えや価値観が凝り固まり、思考を束縛するような考え方"]
+  }
 }
