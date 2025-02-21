@@ -177,8 +177,26 @@ public class WordService implements IWordService {
 
     @Override
     public void deleteWordById(Long id) {
+        Word word = wordRepository.findById(id).orElseThrow(() ->
+                new WordNotFoundException("Word not found to delete!"));
+        prepareToDeleteWordByDeletingForeginKeyData(word);
+        wordRepository.findById(word.getId())
+                .ifPresentOrElse(wordRepository::delete, () -> {throw new WordNotFoundException("Word not found to delete!");});
+    }
 
-        Word word = wordRepository.findById(id).orElseThrow(() -> new WordNotFoundException("Word not found"));
+    @Override
+    public void deleteWordByJapaneseWord(String japaneseWord) {
+        if (wordExists(japaneseWord)) {
+            Word word = wordRepository.findByJapaneseWord(japaneseWord);
+            prepareToDeleteWordByDeletingForeginKeyData(word);
+            wordRepository.findById(word.getId())
+                    .ifPresentOrElse(wordRepository::delete, () -> {throw new WordNotFoundException("Word not found to delete!");});
+        } else {
+            throw new WordNotFoundException("Word not found to delete!");
+        }
+    }
+
+    private void prepareToDeleteWordByDeletingForeginKeyData(Word word){
         for (WordDefinition wordDefinition : word.getDefinitions()){
             wordDefinitionRepository.delete(wordDefinition);
         }
@@ -193,32 +211,6 @@ public class WordService implements IWordService {
             wordsForEnglishWord.removeIf(matchingWord -> matchingWord.getEnglishWord().equals(word.getEnglishWord()));
             english.setWord(wordsForEnglishWord);
             englishWordRepository.save(english);
-        }
-        wordRepository.findById(word.getId()).ifPresentOrElse(wordRepository::delete, () -> {throw new WordNotFoundException("Word not found to delete!");});
-    }
-
-    @Override
-    public void deleteWordByJapaneseWord(String japaneseWord) {
-        if (wordExists(japaneseWord)) {
-            Word word = wordRepository.findByJapaneseWord(japaneseWord);
-            for (WordDefinition wordDefinition : word.getDefinitions()){
-                wordDefinitionRepository.delete(wordDefinition);
-            }
-            for (Category category : word.getCategory()){
-                Collection<Word> wordsForCategory = category.getWords();
-                wordsForCategory.removeIf(wordInCategory -> wordInCategory.getJapaneseWord().equals(word.getJapaneseWord()));
-                category.setWords(wordsForCategory);
-                categoryRepository.save(category);
-            }
-            for (EnglishWord english : word.getEnglishWord()){
-                Collection<Word> wordsForEnglishWord = english.getWord();
-                wordsForEnglishWord.removeIf(matchingWord -> matchingWord.getEnglishWord().equals(word.getEnglishWord()));
-                english.setWord(wordsForEnglishWord);
-                englishWordRepository.save(english);
-            }
-            wordRepository.findById(word.getId()).ifPresentOrElse(wordRepository::delete, () -> {throw new WordNotFoundException("Word not found to delete!");});
-        } else {
-            throw new WordNotFoundException("Word not found to delete!");
         }
     }
 
