@@ -8,7 +8,6 @@ import com.japanese.study_app.model.EnglishWord;
 import com.japanese.study_app.model.WordDefinition;
 import com.japanese.study_app.repository.EnglishWordRepository;
 import com.japanese.study_app.repository.WordDefinitionRepository;
-import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import com.japanese.study_app.exceptions.AlreadyExistsException;
@@ -178,16 +177,33 @@ public class WordService implements IWordService {
 
     @Override
     public void deleteWordById(Long id) {
-        // wordRepository::delete is a method reference that refers to the delete method of the wordRepository
-        wordRepository.findById(id)
-            .ifPresentOrElse(wordRepository::delete, () -> {throw new WordNotFoundException("Word not found to delete!");});
+
+        Word word = wordRepository.findById(id).orElseThrow(() -> new WordNotFoundException("Word not found"));
+        for (WordDefinition wordDefinition : word.getDefinitions()){
+            wordDefinitionRepository.delete(wordDefinition);
+        }
+        for (Category category : word.getCategory()){
+            Collection<Word> wordsForCategory = category.getWords();
+            wordsForCategory.removeIf(wordInCategory -> wordInCategory.getJapaneseWord().equals(word.getJapaneseWord()));
+            category.setWords(wordsForCategory);
+            categoryRepository.save(category);
+        }
+        for (EnglishWord english : word.getEnglishWord()){
+            Collection<Word> wordsForEnglishWord = english.getWord();
+            wordsForEnglishWord.removeIf(matchingWord -> matchingWord.getEnglishWord().equals(word.getEnglishWord()));
+            english.setWord(wordsForEnglishWord);
+            englishWordRepository.save(english);
+        }
+        wordRepository.findById(word.getId()).ifPresentOrElse(wordRepository::delete, () -> {throw new WordNotFoundException("Word not found to delete!");});
     }
 
     @Override
-    @Transactional
     public void deleteWordByJapaneseWord(String japaneseWord) {
         if (wordExists(japaneseWord)) {
             Word word = wordRepository.findByJapaneseWord(japaneseWord);
+            for (WordDefinition wordDefinition : word.getDefinitions()){
+                wordDefinitionRepository.delete(wordDefinition);
+            }
             for (Category category : word.getCategory()){
                 Collection<Word> wordsForCategory = category.getWords();
                 wordsForCategory.removeIf(wordInCategory -> wordInCategory.getJapaneseWord().equals(word.getJapaneseWord()));
