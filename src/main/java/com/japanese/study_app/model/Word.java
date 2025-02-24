@@ -30,8 +30,8 @@ public class Word {
     // private Collection<ExampleSentence> exampleSentences = new HashSet<>();
 
     // when the word is deleted, so too will the definitions
-     @OneToMany(mappedBy = "word", cascade = CascadeType.ALL, orphanRemoval = true)
-     private List<WordDefinition> definitions;
+    @OneToOne(mappedBy = "word", cascade = CascadeType.ALL, orphanRemoval = true)
+    private WordDefinition definitions;
 
     @ManyToMany(mappedBy = "words")
     @JsonIgnore
