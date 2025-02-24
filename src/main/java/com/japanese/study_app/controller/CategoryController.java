@@ -3,14 +3,11 @@ package com.japanese.study_app.controller;
 import com.japanese.study_app.dto.CategoryDto;
 import com.japanese.study_app.exceptions.AlreadyExistsException;
 import com.japanese.study_app.exceptions.CategoryNotFoundException;
-import com.japanese.study_app.model.Category;
 import com.japanese.study_app.request.AddCategoryRequest;
 import com.japanese.study_app.response.ApiResponse;
 import com.japanese.study_app.service.category.ICategoryService;
 
 import lombok.RequiredArgsConstructor;
-
-import org.apache.coyote.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -77,7 +74,7 @@ public class CategoryController {
     }
 
     @DeleteMapping("/delete/name/{name}")
-    public ResponseEntity<ApiResponse> deleteCategoryById(@PathVariable String name){
+    public ResponseEntity<ApiResponse> deleteCategoryByName(@PathVariable String name){
         try{
             categoryService.deleteCategoryByName(name);
             return ResponseEntity.ok(new ApiResponse("Category " + name + " successfully deleted.", null));
