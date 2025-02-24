@@ -169,7 +169,7 @@ public class WordService implements IWordService {
     public void deleteWordById(Long id) {
         Word word = wordRepository.findById(id).orElseThrow(() ->
                 new WordNotFoundException("Word not found to delete!"));
-        prepareToDeleteWordByDeletingForeginKeyData(word);
+        prepareToDeleteWordByDeletingForeignKeyData(word);
         wordRepository.findById(word.getId())
                 .ifPresentOrElse(wordRepository::delete, () -> {throw new WordNotFoundException("Word not found to delete!");});
     }
@@ -178,7 +178,7 @@ public class WordService implements IWordService {
     public void deleteWordByJapaneseWord(String japaneseWord) {
         if (wordExists(japaneseWord)) {
             Word word = wordRepository.findByJapaneseWord(japaneseWord);
-            prepareToDeleteWordByDeletingForeginKeyData(word);
+            prepareToDeleteWordByDeletingForeignKeyData(word);
             wordRepository.findById(word.getId())
                     .ifPresentOrElse(wordRepository::delete, () -> {throw new WordNotFoundException("Word not found to delete!");});
         } else {
@@ -186,20 +186,14 @@ public class WordService implements IWordService {
         }
     }
 
-    private void prepareToDeleteWordByDeletingForeginKeyData(Word word){
+    private void prepareToDeleteWordByDeletingForeignKeyData(Word word){
         wordDefinitionRepository.delete(word.getDefinitions());
 
         for (Category category : word.getCategory()){
-            Collection<Word> wordsForCategory = category.getWords();
-            wordsForCategory.removeIf(wordInCategory -> wordInCategory.getJapaneseWord().equals(word.getJapaneseWord()));
-            category.setWords(wordsForCategory);
-            categoryRepository.save(category);
+            removeWordFromCategory(category, word);
         }
         for (EnglishWord english : word.getEnglishWord()){
-            Collection<Word> wordsForEnglishWord = english.getWord();
-            wordsForEnglishWord.removeIf(matchingWord -> matchingWord.getEnglishWord().equals(word.getEnglishWord()));
-            english.setWord(wordsForEnglishWord);
-            englishWordRepository.save(english);
+            removeWordFromEnglishWord(english, word);
         }
     }
 
@@ -211,12 +205,14 @@ public class WordService implements IWordService {
         }
         // update the database entries as needed
         Set<Category> updatedCategories = request.getCategory();
+        checkIfCategoriesHaveBeenRemoved(wordToUpdate, updatedCategories);
         dealWithCategoriesInRepository(updatedCategories);
         wordToUpdate.setCategory(updatedCategories);
         // Ensure that the new Category (if any) has the new word set
         addWordToCategoryMapping(wordToUpdate);
 
         Set<EnglishWord> updatedEnglishWords = request.getEnglishWord();
+        checkIfEnglishWordsHaveBeenRemoved(wordToUpdate, updatedEnglishWords);
         dealWithEnglishWordsInRepository(updatedEnglishWords);
         wordToUpdate.setEnglishWord(updatedEnglishWords);
         // Ensure that the new English Word (if any) has the new word set
@@ -399,6 +395,38 @@ public class WordService implements IWordService {
                 categoryRepository.save(category);
             }
         });
+    }
+
+    private void checkIfCategoriesHaveBeenRemoved(Word word, Set<Category> updatedCategoryList){
+        for (Category category : word.getCategory()){
+            if (! updatedCategoryList.contains(category)){
+                // Remove mapping from database
+                removeWordFromCategory(category, word);
+            }
+        }
+    }
+
+    private void checkIfEnglishWordsHaveBeenRemoved(Word word, Set<EnglishWord> updatedEnglishWords){
+        for (EnglishWord englishWord : word.getEnglishWord()){
+            if (! updatedEnglishWords.contains(englishWord)){
+                // Remove mapping from database
+                removeWordFromEnglishWord(englishWord, word);
+            }
+        }
+    }
+
+    private void removeWordFromCategory(Category category, Word word){
+        Collection<Word> wordsForCategory = category.getWords();
+        wordsForCategory.removeIf(wordInCategory -> wordInCategory.getJapaneseWord().equals(word.getJapaneseWord()));
+        category.setWords(wordsForCategory);
+        categoryRepository.save(category);
+    }
+
+    private void removeWordFromEnglishWord(EnglishWord english, Word word){
+        Collection<Word> wordsForEnglishWord = english.getWord();
+        wordsForEnglishWord.removeIf(matchingWord -> matchingWord.getEnglishWord().equals(word.getEnglishWord()));
+        english.setWord(wordsForEnglishWord);
+        englishWordRepository.save(english);
     }
 
 }
