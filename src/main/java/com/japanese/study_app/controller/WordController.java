@@ -4,6 +4,7 @@ import com.japanese.study_app.dto.WordDto;
 import com.japanese.study_app.exceptions.AlreadyExistsException;
 import com.japanese.study_app.exceptions.WordNotFoundException;
 import com.japanese.study_app.request.AddWordRequest;
+import com.japanese.study_app.request.UpdateWordRequest;
 import com.japanese.study_app.response.ApiResponse;
 import com.japanese.study_app.service.word.IWordService;
 
@@ -131,9 +132,18 @@ public class WordController {
             WordDto word = wordService.getWordById(id);
             return ResponseEntity.ok(new ApiResponse("Word with id " + id + " retrieved successfully.", word));
         } catch (Exception e) {
-            return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new ApiResponse("Failed to find words matching given criteria.", INTERNAL_SERVER_ERROR));
+            return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new ApiResponse(e.getMessage() + " Failed to find words matching given criteria.", INTERNAL_SERVER_ERROR));
         }
     }
-    
+
+    @PutMapping("/update")
+    public ResponseEntity<ApiResponse> updateWord(@RequestBody UpdateWordRequest updateRequest){
+        try {
+            WordDto updatedWord = wordService.updateWord(updateRequest);
+            return ResponseEntity.ok(new ApiResponse("Word '" + updateRequest.getJapaneseWord() + "' successfully updated.", updatedWord));
+        } catch (WordNotFoundException e){
+            return ResponseEntity.status(CONFLICT).body(new ApiResponse(e.getMessage(), null));
+        }
+    }
 
 }
