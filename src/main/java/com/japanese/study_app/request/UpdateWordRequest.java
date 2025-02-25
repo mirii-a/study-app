@@ -1,8 +1,11 @@
 package com.japanese.study_app.request;
 
 import java.util.Collection;
+import java.util.Map;
+import java.util.Set;
 
 import com.japanese.study_app.model.Category;
+import com.japanese.study_app.model.EnglishWord;
 import com.japanese.study_app.model.ExampleSentence;
 // import com.japanese.study_app.model.WordDefinition;
 
@@ -12,9 +15,9 @@ import lombok.Data;
 public class UpdateWordRequest {
     private Long id;
     private String japaneseWord;
-    private String englishWord;
+    private Set<EnglishWord> englishWord;
     private String hiragana;
-    private Collection<ExampleSentence> exampleSentences;
-    // private Collection<WordDefinition> definitions;
-    private Collection<Category> category;
+//    private Collection<ExampleSentence> exampleSentences;
+    private Map<String, Set<String>> definitions;
+    private Set<Category> category;
 }

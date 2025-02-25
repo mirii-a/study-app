@@ -5,6 +5,7 @@ import java.util.List;
 import com.japanese.study_app.dto.WordDto;
 import com.japanese.study_app.model.Word;
 import com.japanese.study_app.request.AddWordRequest;
+import com.japanese.study_app.request.UpdateWordRequest;
 
 public interface IWordService {
 
@@ -13,7 +14,7 @@ public interface IWordService {
     WordDto getWordById(Long id);
     void deleteWordById(Long id);
     void deleteWordByJapaneseWord(String japaneseWord);
-    Word updateWord();
+    WordDto updateWord(UpdateWordRequest request);
     // Collection<ExampleSentence> getExampleSentencesByWordId(Long wordId);
     // Collection<WordDefinition> getDefinitionByWordId(Long wordId);
 
