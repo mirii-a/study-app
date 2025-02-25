@@ -4,20 +4,14 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import com.japanese.study_app.dto.WordDto;
-import com.japanese.study_app.model.EnglishWord;
-import com.japanese.study_app.model.WordDefinition;
-import com.japanese.study_app.repository.EnglishWordRepository;
-import com.japanese.study_app.repository.WordDefinitionRepository;
+import com.japanese.study_app.model.*;
+import com.japanese.study_app.repository.*;
 import com.japanese.study_app.request.UpdateWordRequest;
 import org.springframework.stereotype.Service;
 
 import com.japanese.study_app.exceptions.AlreadyExistsException;
 import com.japanese.study_app.exceptions.CategoryNotFoundException;
 import com.japanese.study_app.exceptions.WordNotFoundException;
-import com.japanese.study_app.model.Category;
-import com.japanese.study_app.model.Word;
-import com.japanese.study_app.repository.CategoryRepository;
-import com.japanese.study_app.repository.WordRepository;
 import com.japanese.study_app.request.AddWordRequest;
 
 import lombok.RequiredArgsConstructor;
@@ -30,6 +24,7 @@ public class WordService implements IWordService {
     private final CategoryRepository categoryRepository;
     private final EnglishWordRepository englishWordRepository;
     private final WordDefinitionRepository wordDefinitionRepository;
+    private final ExampleSentenceRepository exampleSentenceRepository;
 //    private final ModelMapper modelMapper;
 
     @Override
@@ -58,6 +53,7 @@ public class WordService implements IWordService {
 
         Set<EnglishWord> englishWords = dealWithEnglishWords(request);
         Set<Category> categories = dealWithCategories(request);
+        Set<ExampleSentence> exampleSentences = dealWithExampleSentences(request);
 
         return new Word(
             request.getJapaneseWord(),
@@ -110,6 +106,34 @@ public class WordService implements IWordService {
                 categoryFromDb.ifPresent(value -> {
                     category.setId(value.getId());
                     category.setName(value.getName());
+                });
+            }
+        });
+    }
+
+    private Set<ExampleSentence> dealWithExampleSentences(AddWordRequest request){
+        Set<ExampleSentence> exampleSentences = request.getExampleSentences();
+        dealWithExampleSentencesInRepository(exampleSentences);
+        return exampleSentences;
+    }
+
+    private void dealWithExampleSentencesInRepository(Set<ExampleSentence> exampleSentenceInput){
+        exampleSentenceInput.forEach(exampleSentence -> {
+            boolean exampleExists = exampleSentenceRepository.existsByJapaneseSentence(exampleSentence.getJapaneseSentence());
+            if (!exampleExists){
+                ExampleSentence newExample = new ExampleSentence();
+                newExample.setJapaneseSentence(exampleSentence.getJapaneseSentence());
+                newExample.setEnglishSentence(exampleSentence.getEnglishSentence());
+                newExample.setHiraganaSentence(exampleSentence.getHiraganaSentence());
+                exampleSentenceRepository.save(newExample);
+                exampleSentence.setId(newExample.getId());
+            } else {
+                Optional<ExampleSentence> exampleFromDb = exampleSentenceRepository.findByJapaneseSentence(exampleSentence.getJapaneseSentence());
+                exampleFromDb.ifPresent(value -> {
+                    exampleSentence.setId(value.getId());
+                    exampleSentence.setJapaneseSentence(value.getJapaneseSentence());
+                    exampleSentence.setHiraganaSentence(value.getHiraganaSentence());
+                    exampleSentence.setEnglishSentence(value.getEnglishSentence());
                 });
             }
         });
