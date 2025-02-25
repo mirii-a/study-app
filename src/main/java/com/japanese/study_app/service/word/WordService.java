@@ -187,7 +187,9 @@ public class WordService implements IWordService {
     }
 
     private void prepareToDeleteWordByDeletingForeignKeyData(Word word){
-        wordDefinitionRepository.delete(word.getDefinitions());
+        if (word.getDefinitions() != null){
+            wordDefinitionRepository.delete(word.getDefinitions());
+        }
 
         for (Category category : word.getCategory()){
             removeWordFromCategory(category, word);
