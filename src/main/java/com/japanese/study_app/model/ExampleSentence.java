@@ -27,7 +27,7 @@ public class ExampleSentence {
     private Long id;
 
     private String japaneseSentence;
-    private String hiraganaSentence;
+//    private String hiraganaSentence;
     private String englishSentence;
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})

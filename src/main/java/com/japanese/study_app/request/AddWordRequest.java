@@ -16,7 +16,7 @@ public class AddWordRequest {
     private String japaneseWord;
     private Set<EnglishWord> englishWord;
     private String hiragana;
-    private Set<ExampleSentence> exampleSentences;
+    private Set<Map<String, String>> exampleSentence;
     private Map<String, Set<String>> definitions;
     private Set<Category> category;
 }
