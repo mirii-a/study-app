@@ -36,7 +36,6 @@ public class WordService implements IWordService {
         Word newWord = wordRepository.save(createWord(request));
 
         addWordToEnglishWordMapping(newWord);
-
         addWordToCategoryMapping(newWord);
 
         Map<String, Set<String>> definitions = request.getDefinitions();
@@ -53,10 +52,8 @@ public class WordService implements IWordService {
     }
 
     private Word createWord(AddWordRequest request){
-
         Set<EnglishWord> englishWords = dealWithEnglishWords(request);
         Set<Category> categories = dealWithCategories(request);
-//        Set<ExampleSentence> exampleSentences = dealWithExampleSentences(request);
 
         return new Word(
             request.getJapaneseWord(),
@@ -146,7 +143,6 @@ public class WordService implements IWordService {
                         exampleSentenceRepository.save(sentenceExample);
 
                         Collection<ExampleSentence> exampleSentencesForWord = exampleSentenceRepository.findByWords(word);
-//                        exampleSentencesForWord.add(sentenceExample);
                         word.setExampleSentences(exampleSentencesForWord);
                     }
                 } else {
@@ -406,12 +402,10 @@ public class WordService implements IWordService {
             List<String> allJapaneseDefinitions = convertDefinitionsToListOfStringsForDtoOutput(
                     definitionsForWord.getDefinitionJapanese().split(";"));
 
-            wordDto.setEnglishDefinitions(allEnglishDefinitions);
-            wordDto.setJapaneseDefinitions(allJapaneseDefinitions);
+            setDefinitionsForWordDto(wordDto, allEnglishDefinitions, allJapaneseDefinitions);
         } else {
             List<String> blankList = new ArrayList<>();
-            wordDto.setEnglishDefinitions(blankList);
-            wordDto.setJapaneseDefinitions(blankList);
+            setDefinitionsForWordDto(wordDto, blankList, blankList);
         }
 
         if (word.getExampleSentences() != null){
@@ -429,6 +423,11 @@ public class WordService implements IWordService {
             wordDto.setExampleSentences(blankList);
         }
         return wordDto;
+    }
+
+    private void setDefinitionsForWordDto(WordDto wordDto, List<String> englishDefinitions, List<String> japaneseDefinitions){
+        wordDto.setEnglishDefinitions(englishDefinitions);
+        wordDto.setJapaneseDefinitions(japaneseDefinitions);
     }
 
     private void addWordToEnglishWordMapping(Word word){
