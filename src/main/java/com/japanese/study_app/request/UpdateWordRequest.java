@@ -17,7 +17,7 @@ public class UpdateWordRequest {
     private String japaneseWord;
     private Set<EnglishWord> englishWord;
     private String hiragana;
-//    private Collection<ExampleSentence> exampleSentences;
+    private Set<Map<String, String>> exampleSentence;
     private Map<String, Set<String>> definitions;
     private Set<Category> category;
 }
