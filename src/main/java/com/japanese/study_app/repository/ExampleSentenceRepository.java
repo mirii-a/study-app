@@ -9,6 +9,7 @@ import java.util.Optional;
 
 public interface ExampleSentenceRepository extends JpaRepository<ExampleSentence, Long> {
     boolean existsByJapaneseSentence(String japaneseSentence);
+    boolean existsById(Long Id);
     Optional<ExampleSentence> findByJapaneseSentence(String japaneseSentence);
     Collection<ExampleSentence> findByWords(Word word);
 }

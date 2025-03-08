@@ -1,10 +1,19 @@
 package com.japanese.study_app.controller;
 
+import com.japanese.study_app.exceptions.ExampleSentenceNotFoundException;
+import com.japanese.study_app.exceptions.WordNotFoundException;
+import com.japanese.study_app.model.ExampleSentence;
+import com.japanese.study_app.response.ApiResponse;
 import com.japanese.study_app.service.exampleSentence.IExampleSentenceService;
 import com.japanese.study_app.service.word.IWordService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+import static org.springframework.http.HttpStatus.CONFLICT;
+import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 
 @RequiredArgsConstructor
 @RestController
@@ -12,4 +21,24 @@ import org.springframework.web.bind.annotation.RestController;
 public class ExampleSentenceController {
 
     private final IExampleSentenceService exampleSentenceService;
+
+    @DeleteMapping("/delete/id/{id}")
+    public ResponseEntity<ApiResponse> deleteExampleById(@PathVariable Long id){
+        try {
+            exampleSentenceService.deleteExampleSentenceById(id);
+            return ResponseEntity.ok(new ApiResponse("Example Sentence deleted successfully.", null));
+        } catch(ExampleSentenceNotFoundException e){
+            return ResponseEntity.status(CONFLICT).body(new ApiResponse(e.getMessage(), null));
+        }
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<ApiResponse> getAllExampleSentences(){
+        try {
+            List<ExampleSentence> examples = exampleSentenceService.getAllExampleSentences();
+            return ResponseEntity.ok(new ApiResponse("All example sentences retrieved successfully.", examples));
+        } catch (Exception e) {
+            return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new ApiResponse("Failed to find words.", INTERNAL_SERVER_ERROR));
+        }
+    }
 }

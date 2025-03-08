@@ -30,6 +30,7 @@ public class ExampleSentence {
 //    private String hiraganaSentence;
     private String englishSentence;
 
+    @JsonIgnore
     @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinTable(name = "example_sentences_for_words", joinColumns = @JoinColumn(name = "example_sentence_id", referencedColumnName = "id"), 
         inverseJoinColumns = @JoinColumn(name = "word_id", referencedColumnName = "id")
