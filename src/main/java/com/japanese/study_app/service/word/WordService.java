@@ -239,6 +239,12 @@ public class WordService implements IWordService {
             wordDefinitionRepository.delete(word.getDefinitions());
         }
 
+        if (word.getExampleSentences() != null){
+            for (ExampleSentence sentence : word.getExampleSentences()){
+                exampleSentenceRepository.delete(sentence);
+            }
+        }
+
         for (Category category : word.getCategory()){
             removeWordFromCategory(category, word);
         }
