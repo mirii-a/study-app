@@ -9,4 +9,7 @@ import java.util.List;
 public interface StudyRepository extends JpaRepository<Word, Long> {
     @Query("select w from Word w order by RAND() limit 3")
     List<Word> findRandomWords();
+
+    @Query("select w from Word w order by RAND() limit ?1")
+    List<Word> findNumberOfRandomWords(Long number);
 }

@@ -17,8 +17,14 @@ public class StudyService implements IStudyService{
     private final WordService wordService;
 
     @Override
-    public List<WordDto> getRandomWordSet() {
+    public List<WordDto> getRandomWords() {
         List<Word> randomWords = studyRepository.findRandomWords();
+        return randomWords.stream().map(wordService::convertWordToDto).toList();
+    }
+
+    @Override
+    public List<WordDto> getNumberOfRandomWords(Long numberOfWordsToReturn) {
+        List<Word> randomWords = studyRepository.findNumberOfRandomWords(numberOfWordsToReturn);
         return randomWords.stream().map(wordService::convertWordToDto).toList();
     }
 

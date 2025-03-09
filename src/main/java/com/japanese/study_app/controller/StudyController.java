@@ -6,6 +6,7 @@ import com.japanese.study_app.service.study.IStudyService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -23,10 +24,20 @@ public class StudyController {
     @GetMapping("/random")
     public ResponseEntity<ApiResponse> getRandomWords(){
         try {
-            List<WordDto> randomWords = studyService.getRandomWordSet();
+            List<WordDto> randomWords = studyService.getRandomWords();
             return ResponseEntity.ok(new ApiResponse("Random words retrieved successfully.", randomWords));
         } catch (Exception e) {
-            return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new ApiResponse("Failed to find words.", INTERNAL_SERVER_ERROR));
+            return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new ApiResponse("Retrieval of random words failed.", INTERNAL_SERVER_ERROR));
+        }
+    }
+
+    @GetMapping("/random/{number}")
+    public ResponseEntity<ApiResponse> getNumberOfRandomWords(@PathVariable Long number){
+        try {
+            List<WordDto> randomWords = studyService.getNumberOfRandomWords(number);
+            return ResponseEntity.ok(new ApiResponse("Random words retrieved successfully.", randomWords));
+        } catch (Exception e) {
+            return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new ApiResponse("Retrieval of random words failed.", INTERNAL_SERVER_ERROR));
         }
     }
 }
