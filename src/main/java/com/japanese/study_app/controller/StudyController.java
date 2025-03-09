@@ -1,7 +1,6 @@
 package com.japanese.study_app.controller;
 
 import com.japanese.study_app.dto.WordDto;
-import com.japanese.study_app.model.Word;
 import com.japanese.study_app.response.ApiResponse;
 import com.japanese.study_app.service.study.IStudyService;
 import lombok.RequiredArgsConstructor;
