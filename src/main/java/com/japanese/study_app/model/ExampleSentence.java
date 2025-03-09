@@ -3,6 +3,7 @@ package com.japanese.study_app.model;
 import java.util.Collection;
 import java.util.HashSet;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -26,15 +27,16 @@ public class ExampleSentence {
     private Long id;
 
     private String japaneseSentence;
-    private String hiraganaSentence;
+//    private String hiraganaSentence;
     private String englishSentence;
 
-
+    @JsonIgnore
     @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinTable(name = "example_sentences_for_words", joinColumns = @JoinColumn(name = "example_sentence_id", referencedColumnName = "id"), 
         inverseJoinColumns = @JoinColumn(name = "word_id", referencedColumnName = "id")
     )
     private Collection<Word> words = new HashSet<>();
 
+    // Add Category to ExampleSentence
 
 }

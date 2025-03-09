@@ -80,7 +80,25 @@
 "definitions": {
   "english": ["A biased view. An unfair opinion.", "A biased view or way of thinking. An unfavorable prejudice or judgment of a group or individual that is held without objective evidence."],
   "japanese": ["偏った見解。中正でない意見。", "かたよった見方・考え方。ある集団や個人に対して、客観的な根拠なしにいだかれる非好意的な先入観や判断。"]
-  }
+  },
+"exampleSentence": [
+    {
+      "japaneseSentence": "恋愛体質の女性に対して思慮が浅いという偏見を持っている。",
+      "englishSentence": "He has a prejudice against women who are prone to falling in love, thinking that they are thoughtless."
+    },
+    {
+      "japaneseSentence": "私は、絵文字を多用する男性に対して、女々しいという偏見の目で見てしまう。",
+      "englishSentence": "I have a prejudice against men who use a lot of emojis, thinking they are effeminate."
+    },
+    {
+      "japaneseSentence": "彼は人種的な偏見を強く持っている人ではない。",
+      "englishSentence": "He is not a person who holds strong racial prejudices."
+    },
+    {
+      "japaneseSentence": "私たちは決定にあたって偏見に左右されない。",
+      "englishSentence": "We do not allow prejudice to influence our decisions."
+    }
+  ]
 }
 {
 "japaneseWord": "先入観",
@@ -90,7 +108,17 @@
 "definitions": {
   "english": ["Fixed ideas formed based on the first thing that is learned.", "A fixed idea that is held in advance. A preconceived notion that prevents free thought."],
   "japanese": ["初めに知った事に基づいて作られた固定的な観念。", "前もっていだいている固定的な観念。それによって自由な思考が妨げられる場合にいう。先入見。先入主。"]
-  }
+  },
+  "exampleSentence": [
+    {
+      "japaneseSentence": "補助的なものという先入観で見られつつ現実にはその収入で一家を支えてゆかなければならない世帯主であるところに、異常な苦しみを負わされているのである。",
+      "englishSentence": "Although they are viewed with the preconceived notion that it is only a supplementary income, in reality it is the head of the household who must support their family with that income, and so they are being forced to endure extraordinary hardships."
+    },
+    {
+      "japaneseSentence": "図書館へは学生のうちだけゆくものという先入観が変えられるように、国民の書棚として活きた機能をもつようになったらいいと思う。",
+      "englishSentence": "I hope that libraries will come to have a useful role as bookshelves for the nation, so as to change the preconceived notion that libraries are places only for students."
+    }
+  ]
 }
 {
 "japaneseWord": "既成概念",
@@ -100,7 +128,17 @@
 "definitions": {
   "english": ["A pre-established set of thoughts, values and preconceptions about something."],
   "japanese": ["ある物事について、すでにできあがっている考えや価値観、認識の枠組み"]
-  }
+  },
+  "exampleSentence": [
+    {
+      "japaneseSentence": "既成概念にとらわれず、新たな価値を提供する。",
+      "englishSentence": "We provide new value without being bound by preconceived notions."
+    },
+    {
+      "japaneseSentence": "既成概念を捨てて、斬新なアイデアや革新的な発明をしよう。",
+      "englishSentence": "Think outside the box and come up with new ideas and innovative inventions."
+    }
+  ]
 }
 {
 "japaneseWord": "固定観念",
@@ -110,5 +148,19 @@
 "definitions": {
   "english": ["An idea that is always stuck in one's head and restricts one's thinking", "A way of thinking in which certain ideas or values become rigid and restrict one's thinking"],
   "japanese": ["いつも頭から離れないで、その人の思考を拘束するような考え", "特定の考えや価値観が凝り固まり、思考を束縛するような考え方"]
-  }
+  },
+ "exampleSentence": [
+    {
+      "japaneseSentence": "国民に関する固定観念がどれほど有害かを理解するには、少数の外国人と親しくなるだけで十分だ。",
+      "englishSentence": "One only needs to become acquainted with a small number of foreigners to realise how harmful national stereotypes can be."
+    },
+    {
+      "japaneseSentence": "年下は年上に敬語を使うべきだというのが、あの世代の固定観念らしい。",
+      "englishSentence": "It seems to be a stereotype of that generation that younger people should use honorific language when speaking to older people."
+    },
+    {
+      "japaneseSentence": "彼女は男性がより良いリーダーであるという固定観念を打破することを目指している。",
+      "englishSentence": "She aims to break the stereotype that men are better leaders."
+    }
+]
 }

@@ -26,8 +26,8 @@ public class Word {
     @ManyToMany(mappedBy = "word")
     private Collection<EnglishWord> englishWord = new HashSet<>();
 
-    // @ManyToMany(mappedBy = "words")
-    // private Collection<ExampleSentence> exampleSentences = new HashSet<>();
+    @ManyToMany(mappedBy = "words")
+    private Collection<ExampleSentence> exampleSentences = new HashSet<>();
 
     // when the word is deleted, so too will the definitions
     @OneToOne(mappedBy = "word", cascade = CascadeType.ALL, orphanRemoval = true)
