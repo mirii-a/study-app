@@ -8,5 +8,6 @@ public interface IStudyService {
     List<WordDto> getRandomWords();
     List<WordDto> getNumberOfRandomWords(Long numberOfWordsToReturn);
     List<WordDto> getRandomWordsByCategory(String category);
+    List<WordDto> getNumberOfRandomWordsByCategory(String category, Long numberOfWordsToReturn);
 
 }

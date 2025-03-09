@@ -50,4 +50,14 @@ public class StudyController {
             return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new ApiResponse("Retrieval of random words failed.", INTERNAL_SERVER_ERROR));
         }
     }
+
+    @GetMapping("/random/category/{category}/number/{number}")
+    public ResponseEntity<ApiResponse> getNumberOfRandomWordsByCategory(@PathVariable String category, @PathVariable Long number){
+        try {
+            List<WordDto> randomWords = studyService.getNumberOfRandomWordsByCategory(category, number);
+            return ResponseEntity.ok(new ApiResponse("Random words retrieved successfully.", randomWords));
+        } catch (Exception e) {
+            return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new ApiResponse("Retrieval of random words failed.", INTERNAL_SERVER_ERROR));
+        }
+    }
 }
