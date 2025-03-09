@@ -10,4 +10,6 @@ public interface IStudyService {
     List<WordDto> getRandomWordsByCategory(String category);
     List<WordDto> getNumberOfRandomWordsByCategory(String category, Long numberOfWordsToReturn);
 
+    List<WordDto> getRandomWordsByEnglishWord(String englishWord);
+
 }

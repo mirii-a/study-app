@@ -15,4 +15,7 @@ public interface StudyRepository extends JpaRepository<Word, Long> {
 
     @Query("select w from Word w join Category c on element(c.words).id = w.id where c.name = ?1 order by RAND() limit ?2")
     List<Word> findNumberOfRandomWordsBasedOnCategory(String category, Long number);
+
+    @Query("select w from Word w join EnglishWord e on element(e.word).id = w.id where e.englishWord = ?1 order by RAND() limit ?2")
+    List<Word> findNumberOfRandomWordsBasedOnEnglish(String englishWord, Long number);
 }

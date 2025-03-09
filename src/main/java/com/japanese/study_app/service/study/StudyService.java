@@ -30,7 +30,7 @@ public class StudyService implements IStudyService{
 
     @Override
     public List<WordDto> getRandomWordsByCategory(String category) {
-        List<Word> randomWordsByCategory = studyRepository.findNumberOfRandomWordsBasedOnCategory(category, Long.valueOf(10));
+        List<Word> randomWordsByCategory = studyRepository.findNumberOfRandomWordsBasedOnCategory(category, 10L);
         return randomWordsByCategory.stream().map(wordService::convertWordToDto).toList();
     }
 
@@ -38,5 +38,11 @@ public class StudyService implements IStudyService{
     public List<WordDto> getNumberOfRandomWordsByCategory(String category, Long numberOfWordsToReturn) {
         List<Word> randomWordsByCategory = studyRepository.findNumberOfRandomWordsBasedOnCategory(category, numberOfWordsToReturn);
         return randomWordsByCategory.stream().map(wordService::convertWordToDto).toList();
+    }
+
+    @Override
+    public List<WordDto> getRandomWordsByEnglishWord(String englishWord) {
+        List<Word> randomWordsByEnglish = studyRepository.findNumberOfRandomWordsBasedOnEnglish(englishWord, 10L);
+        return randomWordsByEnglish.stream().map(wordService::convertWordToDto).toList();
     }
 }
