@@ -112,12 +112,12 @@ public class WordService implements IWordService {
     }
 
     private void dealWithExampleSentences(Word word, Set<Map<String, String>> exampleSentences){
-        ExampleSentence sentenceExample = new ExampleSentence();
         if (exampleSentences != null){
             exampleSentences.forEach(example -> {
                 if (!Objects.equals(example.get("japaneseSentence"), "") && example.get("japaneseSentence") != null){
 
                     if (exampleSentenceRepository.existsByJapaneseSentence(example.get("japaneseSentence"))){
+                        ExampleSentence sentenceExample = new ExampleSentence();
                         Optional<ExampleSentence> sentenceAlreadyExisting = exampleSentenceRepository.findByJapaneseSentence(example.get("japaneseSentence"));
                         sentenceAlreadyExisting.ifPresent(value -> {
                             sentenceExample.setJapaneseSentence(value.getJapaneseSentence());
@@ -133,6 +133,7 @@ public class WordService implements IWordService {
                             word.setExampleSentences(exampleSentencesForWord);
                         });
                     } else{
+                        ExampleSentence sentenceExample = new ExampleSentence();
                         sentenceExample.setEnglishSentence(example.get("englishSentence"));
                         sentenceExample.setJapaneseSentence(example.get("japaneseSentence"));
                         Collection<Word> words = new HashSet<>();
@@ -147,16 +148,17 @@ public class WordService implements IWordService {
                     }
                 } else {
                     // Set as blank list as there are no definitions
-                    setBlankExampleSentence(word, sentenceExample);
+                    setBlankExampleSentence(word);
                 }
             });
         }else {
             // Set as blank list as there are no definitions
-            setBlankExampleSentence(word, sentenceExample);
+            setBlankExampleSentence(word);
         }
     }
 
-    private void setBlankExampleSentence(Word word, ExampleSentence blankExampleSentence){
+    private void setBlankExampleSentence(Word word){
+        ExampleSentence blankExampleSentence = new ExampleSentence();
         blankExampleSentence.setEnglishSentence("");
         blankExampleSentence.setJapaneseSentence("");
         Collection<ExampleSentence> blankExamples = new HashSet<>();
