@@ -30,6 +30,7 @@ public class StudyService implements IStudyService{
 
     @Override
     public List<WordDto> getRandomWordsByCategory(String category) {
-        return List.of();
+        List<Word> randomWordsByCategory = studyRepository.findNumberOfRandomWordsBasedOnCategory(category, Long.valueOf(3));
+        return randomWordsByCategory.stream().map(wordService::convertWordToDto).toList();
     }
 }
