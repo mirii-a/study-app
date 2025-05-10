@@ -7,7 +7,6 @@ import com.japanese.study_app.request.AddCategoryRequest;
 import com.japanese.study_app.response.ApiResponse;
 import com.japanese.study_app.service.category.ICategoryService;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,12 +15,15 @@ import java.util.List;
 import static org.springframework.http.HttpStatus.*;
 
 
-@RequiredArgsConstructor
 @RestController
 @RequestMapping("${api.prefix}/categories")
 public class CategoryController {
 
     private final ICategoryService categoryService;
+
+    public CategoryController(ICategoryService categoryService){
+        this.categoryService = categoryService;
+    }
 
     @GetMapping("/all")
     public ResponseEntity<ApiResponse> getAllCategories(){

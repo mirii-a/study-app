@@ -7,23 +7,23 @@ import com.japanese.study_app.request.AddWordRequest;
 import com.japanese.study_app.request.UpdateWordRequest;
 import com.japanese.study_app.response.ApiResponse;
 import com.japanese.study_app.service.word.IWordService;
-
-import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import org.springframework.web.bind.annotation.*;
-import org.springframework.http.ResponseEntity;
 import static org.springframework.http.HttpStatus.CONFLICT;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 
-
-@RequiredArgsConstructor
 @RestController
 @RequestMapping("${api.prefix}/words")
 public class WordController {
 
     private final IWordService wordService;
+
+    public WordController(IWordService wordService) {
+        this.wordService = wordService;
+    }
 
     @GetMapping("/all")
     public ResponseEntity<ApiResponse> getAllWords() {
@@ -140,7 +140,7 @@ public class WordController {
     public ResponseEntity<ApiResponse> updateWord(@RequestBody UpdateWordRequest updateRequest){
         try {
             WordDto updatedWord = wordService.updateWord(updateRequest);
-            return ResponseEntity.ok(new ApiResponse("Word '" + updateRequest.getJapaneseWord() + "' successfully updated.", updatedWord));
+            return ResponseEntity.ok(new ApiResponse("Word '" + updateRequest.japaneseWord() + "' successfully updated.", updatedWord));
         } catch (WordNotFoundException e){
             return ResponseEntity.status(CONFLICT).body(new ApiResponse(e.getMessage(), null));
         }
