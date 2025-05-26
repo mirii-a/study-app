@@ -54,4 +54,16 @@ public class Category {
     public Collection<Word> getWords() {
         return this.words;
     }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setWords(Collection<Word> words) {
+        this.words = words;
+    }
 }

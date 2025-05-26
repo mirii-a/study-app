@@ -1,20 +1,11 @@
 package com.japanese.study_app.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import jakarta.persistence.Entity;
 
 import java.util.Collection;
 import java.util.HashSet;
 
 
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
 @Entity
 public class EnglishWord {
     @Id
@@ -29,7 +20,33 @@ public class EnglishWord {
     )
     private Collection<Word> word = new HashSet<>();
 
+    public EnglishWord() {}
+
     public EnglishWord(String englishWord){
         this.englishWord = englishWord;
+    }
+
+    public Long getId() {
+        return this.id;
+    }
+
+    public String getEnglishWord() {
+        return this.englishWord;
+    }
+
+    public Collection<Word> getWord() {
+        return this.word;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setEnglishWord(String englishWord) {
+        this.englishWord = englishWord;
+    }
+
+    public void setWord(Collection<Word> words) {
+        this.word = words;
     }
 }
