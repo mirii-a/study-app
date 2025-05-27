@@ -123,6 +123,7 @@ public class WordService implements IWordService {
     }
 
     private void dealWithExampleSentences(Word word, Set<Map<String, String>> exampleSentences){
+        // TODO: Add better validation when wanting to update a word. Separate out this logic and move to ExampleSentenceService
         if (exampleSentences != null){
             exampleSentences.forEach(example -> {
                 if (!Objects.equals(example.get("japaneseSentence"), "") && example.get("japaneseSentence") != null){
@@ -161,8 +162,6 @@ public class WordService implements IWordService {
                                 sentenceExample.setJapaneseSentence(example.get("japaneseSentence"));
                                 sentenceExample.setEnglishSentence(value.getEnglishSentence());
                                 sentenceExample.setId(value.getId());
-
-                                value.setJapaneseSentence(example.get("japaneseSentence"));
                             } else {
                                 sentenceExample.setJapaneseSentence(value.getJapaneseSentence());
                                 sentenceExample.setEnglishSentence(value.getEnglishSentence());
