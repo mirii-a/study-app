@@ -1,21 +1,19 @@
 package com.japanese.study_app.request;
 
-import java.util.Map;
-import java.util.Set;
-
 import com.japanese.study_app.model.Category;
 import com.japanese.study_app.model.EnglishWord;
 
+import java.util.Map;
+import java.util.Set;
 
-import lombok.Data;
+public record UpdateWordRequest(
+        Long id,
+        String japaneseWord,
+        Set<EnglishWord> englishWord,
+        String hiragana,
+        Set<Map<String, String>> exampleSentence,
+        Map<String, Set<String>> definitions,
+        Set<Category> category
+) {
 
-@Data
-public class UpdateWordRequest {
-    private Long id;
-    private String japaneseWord;
-    private Set<EnglishWord> englishWord;
-    private String hiragana;
-    private Set<Map<String, String>> exampleSentence;
-    private Map<String, Set<String>> definitions;
-    private Set<Category> category;
 }

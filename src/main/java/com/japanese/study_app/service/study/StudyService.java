@@ -4,17 +4,20 @@ import com.japanese.study_app.dto.WordDto;
 import com.japanese.study_app.model.Word;
 import com.japanese.study_app.repository.StudyRepository;
 import com.japanese.study_app.service.word.WordService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@RequiredArgsConstructor
 @Service
-public class StudyService implements IStudyService{
+public class StudyService implements IStudyService {
 
     private final StudyRepository studyRepository;
     private final WordService wordService;
+
+    public StudyService(StudyRepository studyRepository, WordService wordService) {
+        this.studyRepository = studyRepository;
+        this.wordService = wordService;
+    }
 
     @Override
     public List<WordDto> getRandomWords() {

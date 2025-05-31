@@ -1,27 +1,45 @@
- package com.japanese.study_app.model;
+package com.japanese.study_app.model;
 
- import jakarta.persistence.*;
- import lombok.AllArgsConstructor;
- import lombok.Getter;
- import lombok.NoArgsConstructor;
- import lombok.Setter;
+import jakarta.persistence.*;
 
- import java.util.List;
+@Entity
+public class WordDefinition {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
- @Entity
- @Getter
- @Setter
- @AllArgsConstructor
- @NoArgsConstructor
- public class WordDefinition {
-     @Id
-     @GeneratedValue(strategy = GenerationType.IDENTITY)
-     private Long id;
+    private String definitionJapanese;
+    private String definitionEnglish;
 
-     private String definitionJapanese;
-     private String definitionEnglish;
+    @OneToOne
+    @JoinColumn(name = "word_id")
+    private Word word;
 
-     @OneToOne
-     @JoinColumn(name= "word_id")
-     private Word word;
- }
+    public Long getId() {
+        return this.id;
+    }
+
+    public String getDefinitionJapanese() {
+        return this.definitionJapanese;
+    }
+
+    public String getDefinitionEnglish() {
+        return this.definitionEnglish;
+    }
+
+    public Word getWord() {
+        return this.word;
+    }
+
+    public void setDefinitionJapanese(String definitionJapanese) {
+        this.definitionJapanese = definitionJapanese;
+    }
+
+    public void setDefinitionEnglish(String definitionEnglish) {
+        this.definitionEnglish = definitionEnglish;
+    }
+
+    public void setWord(Word word) {
+        this.word = word;
+    }
+}

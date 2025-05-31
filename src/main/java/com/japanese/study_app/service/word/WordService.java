@@ -14,10 +14,8 @@ import com.japanese.study_app.exceptions.CategoryNotFoundException;
 import com.japanese.study_app.exceptions.WordNotFoundException;
 import com.japanese.study_app.request.AddWordRequest;
 
-import lombok.RequiredArgsConstructor;
 
 @Service
-@RequiredArgsConstructor
 public class WordService implements IWordService {
 
     private final WordRepository wordRepository;
@@ -25,12 +23,25 @@ public class WordService implements IWordService {
     private final EnglishWordRepository englishWordRepository;
     private final WordDefinitionRepository wordDefinitionRepository;
     private final ExampleSentenceRepository exampleSentenceRepository;
-//    private final ModelMapper modelMapper;
+
+    public WordService(WordRepository wordRepository,
+                       CategoryRepository categoryRepository,
+                       EnglishWordRepository englishWordRepository,
+                       WordDefinitionRepository wordDefinitionRepository,
+                       ExampleSentenceRepository exampleSentenceRepository
+    )  {
+        this.wordRepository = wordRepository;
+        this.categoryRepository = categoryRepository;
+        this.englishWordRepository = englishWordRepository;
+        this.wordDefinitionRepository = wordDefinitionRepository;
+        this.exampleSentenceRepository = exampleSentenceRepository;
+
+    }
 
     @Override
     public WordDto addWord(AddWordRequest request) {
-        if (wordExists(request.getJapaneseWord())){
-            throw new AlreadyExistsException(request.getJapaneseWord() + " already exists!");
+        if (wordExists(request.japaneseWord())){
+            throw new AlreadyExistsException(request.japaneseWord() + " already exists!");
         }
 
         Word newWord = wordRepository.save(createWord(request));
@@ -38,10 +49,10 @@ public class WordService implements IWordService {
         addWordToEnglishWordMapping(newWord);
         addWordToCategoryMapping(newWord);
 
-        Map<String, Set<String>> definitions = request.getDefinitions();
+        Map<String, Set<String>> definitions = request.definitions();
         dealWithDefinitions(newWord, definitions);
 
-        Set<Map<String, String>> exampleSentences = request.getExampleSentence();
+        Set<Map<String, String>> exampleSentences = request.exampleSentence();
         dealWithExampleSentences(newWord, exampleSentences);
 
         return convertWordToDto(newWord);
@@ -56,15 +67,15 @@ public class WordService implements IWordService {
         Set<Category> categories = dealWithCategories(request);
 
         return new Word(
-            request.getJapaneseWord(),
+            request.japaneseWord(),
             englishWords,
-            request.getHiragana(),
+            request.hiragana(),
             categories
         );
     }
 
     private Set<EnglishWord> dealWithEnglishWords(AddWordRequest request) {
-        Set<EnglishWord> englishWords = request.getEnglishWord();
+        Set<EnglishWord> englishWords = request.englishWord();
         dealWithEnglishWordsInRepository(englishWords);
         return englishWords;
     }
@@ -88,7 +99,7 @@ public class WordService implements IWordService {
     }
 
     private Set<Category> dealWithCategories(AddWordRequest request){
-        Set<Category> categories = request.getCategory();
+        Set<Category> categories = request.category();
         dealWithCategoriesInRepository(categories);
         return categories;
     }
@@ -112,27 +123,64 @@ public class WordService implements IWordService {
     }
 
     private void dealWithExampleSentences(Word word, Set<Map<String, String>> exampleSentences){
+        // TODO: Add better validation when wanting to update a word. Separate out this logic and move to ExampleSentenceService
         if (exampleSentences != null){
             exampleSentences.forEach(example -> {
                 if (!Objects.equals(example.get("japaneseSentence"), "") && example.get("japaneseSentence") != null){
-
                     if (exampleSentenceRepository.existsByJapaneseSentence(example.get("japaneseSentence"))){
                         ExampleSentence sentenceExample = new ExampleSentence();
                         Optional<ExampleSentence> sentenceAlreadyExisting = exampleSentenceRepository.findByJapaneseSentence(example.get("japaneseSentence"));
                         sentenceAlreadyExisting.ifPresent(value -> {
-                            sentenceExample.setJapaneseSentence(value.getJapaneseSentence());
-                            sentenceExample.setEnglishSentence(value.getEnglishSentence());
-                            sentenceExample.setId(value.getId());
+                            if (!value.getEnglishSentence().equals(example.get("englishSentence"))) {
+                                sentenceExample.setJapaneseSentence(value.getJapaneseSentence());
+                                sentenceExample.setEnglishSentence(example.get("englishSentence"));
+                                sentenceExample.setId(value.getId());
+                            } else {
+                                sentenceExample.setJapaneseSentence(value.getJapaneseSentence());
+                                sentenceExample.setEnglishSentence(value.getEnglishSentence());
+                                sentenceExample.setId(value.getId());
+                            }
                             Collection<Word> words = value.getWords();
-                            words.add(word);
-                            value.setWords(words);
-                            exampleSentenceRepository.save(value);
+
+                            if (!example.get("englishSentence").equals(value.getEnglishSentence())){
+                                value.setEnglishSentence(example.get("englishSentence"));
+                                if (!words.contains(word)) {
+                                    words.add(word);
+                                    value.setWords(words);
+                                }
+                                exampleSentenceRepository.save(value);
+                            }
 
                             Collection<ExampleSentence> exampleSentencesForWord = exampleSentenceRepository.findByWords(word);
-                            exampleSentencesForWord.add(sentenceExample);
                             word.setExampleSentences(exampleSentencesForWord);
                         });
-                    } else{
+                    } else if (exampleSentenceRepository.existsByEnglishSentence(example.get("englishSentence")) && !exampleSentenceRepository.existsByJapaneseSentence(example.get("japaneseSentence"))){
+                        ExampleSentence sentenceExample = new ExampleSentence();
+                        Optional<ExampleSentence> sentenceAlreadyExisting = exampleSentenceRepository.findByEnglishSentence(example.get("englishSentence"));
+                        sentenceAlreadyExisting.ifPresent(value -> {
+                            if (!value.getJapaneseSentence().equals(example.get("japaneseSentence"))) {
+                                sentenceExample.setJapaneseSentence(example.get("japaneseSentence"));
+                                sentenceExample.setEnglishSentence(value.getEnglishSentence());
+                                sentenceExample.setId(value.getId());
+                            } else {
+                                sentenceExample.setJapaneseSentence(value.getJapaneseSentence());
+                                sentenceExample.setEnglishSentence(value.getEnglishSentence());
+                                sentenceExample.setId(value.getId());
+                            }
+                            Collection<Word> words = value.getWords();
+
+                            if (!example.get("japaneseSentence").equals(value.getJapaneseSentence())){
+                                value.setJapaneseSentence(example.get("japaneseSentence"));
+                                if (!words.contains(word)) {
+                                    words.add(word);
+                                    value.setWords(words);
+                                }
+                                exampleSentenceRepository.save(value);
+                            }
+                            Collection<ExampleSentence> exampleSentencesForWord = exampleSentenceRepository.findByWords(word);
+                            word.setExampleSentences(exampleSentencesForWord);
+                        });
+                    } else {
                         ExampleSentence sentenceExample = new ExampleSentence();
                         sentenceExample.setEnglishSentence(example.get("englishSentence"));
                         sentenceExample.setJapaneseSentence(example.get("japaneseSentence"));
@@ -257,34 +305,34 @@ public class WordService implements IWordService {
 
     @Override
     public WordDto updateWord(UpdateWordRequest request) {
-        Word wordToUpdate = wordRepository.findByJapaneseWord(request.getJapaneseWord());
+        Word wordToUpdate = wordRepository.findByJapaneseWord(request.japaneseWord());
         if (wordToUpdate == null){
-            throw new WordNotFoundException("No word '" + request.getJapaneseWord() + "' found to update.");
+            throw new WordNotFoundException("No word '" + request.japaneseWord() + "' found to update.");
         }
         // update the database entries as needed
-        Set<Category> updatedCategories = request.getCategory();
+        Set<Category> updatedCategories = request.category();
         checkIfCategoriesHaveBeenRemoved(wordToUpdate, updatedCategories);
         dealWithCategoriesInRepository(updatedCategories);
         wordToUpdate.setCategory(updatedCategories);
         // Ensure that the new Category (if any) has the new word set
         addWordToCategoryMapping(wordToUpdate);
 
-        Set<EnglishWord> updatedEnglishWords = request.getEnglishWord();
+        Set<EnglishWord> updatedEnglishWords = request.englishWord();
         checkIfEnglishWordsHaveBeenRemoved(wordToUpdate, updatedEnglishWords);
         dealWithEnglishWordsInRepository(updatedEnglishWords);
         wordToUpdate.setEnglishWord(updatedEnglishWords);
         // Ensure that the new English Word (if any) has the new word set
         addWordToEnglishWordMapping(wordToUpdate);
 
-        wordToUpdate.setHiragana(request.getHiragana());
-        wordToUpdate.setJapaneseWord(request.getJapaneseWord());
+        wordToUpdate.setHiragana(request.hiragana());
+        wordToUpdate.setJapaneseWord(request.japaneseWord());
 
         wordRepository.save(wordToUpdate);
 
-        Map<String, Set<String>> definitions = request.getDefinitions();
+        Map<String, Set<String>> definitions = request.definitions();
         dealWithDefinitions(wordToUpdate, definitions);
 
-        Set<Map<String, String>> exampleSentences = request.getExampleSentence();
+        Set<Map<String, String>> exampleSentences = request.exampleSentence();
         dealWithExampleSentences(wordToUpdate, exampleSentences);
 
         return convertWordToDto(wordToUpdate);
@@ -395,12 +443,13 @@ public class WordService implements IWordService {
 
     @Override
     public WordDto convertWordToDto(Word word){
-        WordDto wordDto = new WordDto();
-        wordDto.setId(word.getId());
-        wordDto.setEnglishWord(word.getEnglishWord().stream().map(EnglishWord::getEnglishWord).collect(Collectors.toList()));
-        wordDto.setJapaneseWord(word.getJapaneseWord());
-        wordDto.setHiragana(word.getHiragana());
-        wordDto.setCategories(word.getCategory().stream().map(Category::getName).collect(Collectors.toList()));
+        WordDto wordDto = new WordDto(
+                word.getId(),
+                word.getJapaneseWord(),
+                word.getEnglishWord().stream().map(EnglishWord::getEnglishWord).collect(Collectors.toList()),
+                word.getHiragana(),
+                word.getCategory().stream().map(Category::getName).collect(Collectors.toList())
+        );
 
         if (word.getDefinitions() != null){
             WordDefinition definitionsForWord = word.getDefinitions();
@@ -410,10 +459,10 @@ public class WordService implements IWordService {
             List<String> allJapaneseDefinitions = convertDefinitionsToListOfStringsForDtoOutput(
                     definitionsForWord.getDefinitionJapanese().split(";"));
 
-            setDefinitionsForWordDto(wordDto, allEnglishDefinitions, allJapaneseDefinitions);
+            wordDto = setDefinitionsForWordDto(wordDto, allEnglishDefinitions, allJapaneseDefinitions);
         } else {
             List<String> blankList = new ArrayList<>();
-            setDefinitionsForWordDto(wordDto, blankList, blankList);
+            wordDto = setDefinitionsForWordDto(wordDto, blankList, blankList);
         }
 
         if (word.getExampleSentences() != null){
@@ -425,17 +474,18 @@ public class WordService implements IWordService {
                 example.put("japaneseSentence", sentence.getJapaneseSentence());
                 examplesForWord.add(example);
             }
-            wordDto.setExampleSentences(examplesForWord);
+            wordDto = wordDto.updateExampleSentences(examplesForWord);
         } else {
             List<Map<String,String>> blankList = new ArrayList<>();
-            wordDto.setExampleSentences(blankList);
+            wordDto = wordDto.updateExampleSentences(blankList);
         }
         return wordDto;
     }
 
-    private void setDefinitionsForWordDto(WordDto wordDto, List<String> englishDefinitions, List<String> japaneseDefinitions){
-        wordDto.setEnglishDefinitions(englishDefinitions);
-        wordDto.setJapaneseDefinitions(japaneseDefinitions);
+    private WordDto setDefinitionsForWordDto(WordDto wordDto, List<String> englishDefinitions, List<String> japaneseDefinitions){
+        wordDto = wordDto.updateEnglishDefinitions(englishDefinitions);
+        wordDto = wordDto.updateJapaneseDefinitions(japaneseDefinitions);
+        return wordDto;
     }
 
     private void addWordToEnglishWordMapping(Word word){

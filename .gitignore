@@ -33,3 +33,5 @@ build/
 
 ### VS Code ###
 .vscode/
+
+/study-frontend/node_modules
