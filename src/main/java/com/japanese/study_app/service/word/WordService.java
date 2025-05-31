@@ -1,19 +1,21 @@
 package com.japanese.study_app.service.word;
 
-import java.util.*;
-import java.util.stream.Collectors;
-
 import com.japanese.study_app.dto.WordDto;
+import com.japanese.study_app.exceptions.AlreadyExistsException;
+import com.japanese.study_app.exceptions.CategoryNotFoundException;
+import com.japanese.study_app.exceptions.WordNotFoundException;
 import com.japanese.study_app.model.*;
-import com.japanese.study_app.repository.*;
+import com.japanese.study_app.repository.CategoryRepository;
+import com.japanese.study_app.repository.ExampleSentenceRepository;
+import com.japanese.study_app.repository.WordDefinitionRepository;
+import com.japanese.study_app.repository.WordRepository;
+import com.japanese.study_app.request.AddWordRequest;
 import com.japanese.study_app.request.UpdateWordRequest;
 import com.japanese.study_app.service.englishWord.EnglishWordService;
 import org.springframework.stereotype.Service;
 
-import com.japanese.study_app.exceptions.AlreadyExistsException;
-import com.japanese.study_app.exceptions.CategoryNotFoundException;
-import com.japanese.study_app.exceptions.WordNotFoundException;
-import com.japanese.study_app.request.AddWordRequest;
+import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -47,7 +49,7 @@ public class WordService implements IWordService {
 
         Word newWord = wordRepository.save(createWord(request));
 
-        englishWordService.addWordToEnglishWordMapping(newWord);
+        englishWordService.addWordToEnglishWordTranslations(newWord);
         addWordToCategoryMapping(newWord);
 
         Map<String, Set<String>> definitions = request.definitions();
@@ -279,9 +281,10 @@ public class WordService implements IWordService {
         for (Category category : word.getCategory()) {
             removeWordFromCategory(category, word);
         }
-        for (EnglishWord english : word.getEnglishWord()) {
-            englishWordService.removeWordFromEnglishWordTranslation(english, word);
-        }
+
+        word.getEnglishWord().forEach(
+                englishWord ->
+                        englishWordService.removeWordFromEnglishWord(englishWord, word));
     }
 
     @Override
@@ -298,12 +301,7 @@ public class WordService implements IWordService {
         // Ensure that the new Category (if any) has the new word set
         addWordToCategoryMapping(wordToUpdate);
 
-        Set<EnglishWord> updatedEnglishWords = request.englishWord();
-        englishWordService.checkIfEnglishWordsHaveBeenRemovedFromWord(wordToUpdate, updatedEnglishWords);
-        englishWordService.dealWithEnglishWordsInRepository(updatedEnglishWords);
-        wordToUpdate.setEnglishWord(updatedEnglishWords);
-        // Ensure that the new English Word (if any) has the new word set
-        englishWordService.addWordToEnglishWordMapping(wordToUpdate);
+        wordToUpdate = englishWordService.updateEnglishWords(wordToUpdate, request.englishWord());
 
         wordToUpdate.setHiragana(request.hiragana());
         wordToUpdate.setJapaneseWord(request.japaneseWord());

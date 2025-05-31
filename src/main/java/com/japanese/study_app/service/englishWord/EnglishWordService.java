@@ -26,6 +26,19 @@ public class EnglishWordService {
         return englishWords;
     }
 
+    public Word updateEnglishWords(Word wordToUpdate, Set<EnglishWord> updatedEnglishWords) {
+        checkIfEnglishWordsHaveBeenRemovedFromWord(wordToUpdate, updatedEnglishWords);
+        dealWithEnglishWordsInRepository(updatedEnglishWords);
+        wordToUpdate.setEnglishWord(updatedEnglishWords);
+        // Ensure that the new English Word (if any) has the new word set
+        addWordToEnglishWordTranslations(wordToUpdate);
+        return wordToUpdate;
+    }
+
+    public void removeWordFromEnglishWord(EnglishWord englishWord, Word word) {
+        removeWordMappingFromEnglishWords(englishWord, word);
+    }
+
     public boolean checkIfWordExistsByEnglishWord(String englishWord) {
         return englishWordRepository.existsByEnglishWord(englishWord);
     }
@@ -34,7 +47,7 @@ public class EnglishWordService {
         return englishWordRepository.findById(wordId).orElseThrow(() -> new WordNotFoundException("English word with id " + wordId + " not found."));
     }
 
-    public void addWordToEnglishWordMapping(Word word) {
+    public void addWordToEnglishWordTranslations(Word word) {
         Collection<EnglishWord> newEnglishWords = word.getEnglishWord().stream()
                 .map(englishWord -> findEnglishWordById(englishWord.getId()))
                 .toList();
@@ -49,38 +62,44 @@ public class EnglishWordService {
         });
     }
 
-    public void checkIfEnglishWordsHaveBeenRemovedFromWord(Word word, Set<EnglishWord> updatedEnglishWords) {
+    private void dealWithEnglishWordsInRepository(Set<EnglishWord> englishWords) {
+        englishWords.forEach(englishWord -> {
+            boolean englishWordExits = englishWordRepository.existsByEnglishWord(englishWord.getEnglishWord());
+            if (!englishWordExits) {
+                EnglishWord newEnglishWord = addEnglishWordToRepository(englishWord.getEnglishWord());
+                englishWord.setId(newEnglishWord.getId());
+                englishWord.setEnglishWord(newEnglishWord.getEnglishWord());
+            } else {
+                Optional<EnglishWord> existingEnglishWord = englishWordRepository.findByEnglishWord(englishWord.getEnglishWord());
+                existingEnglishWord.ifPresent(value -> {
+                    // Updates the IDs of the English words if they already exist for the Word
+                    englishWord.setId(value.getId());
+//                    englishWord.setEnglishWord(value.getEnglishWord());
+                });
+            }
+        });
+    }
+
+    private EnglishWord addEnglishWordToRepository(String englishWord) {
+        EnglishWord newEnglishWord = new EnglishWord(englishWord);
+        englishWordRepository.save(newEnglishWord);
+        return newEnglishWord;
+    }
+
+    private void checkIfEnglishWordsHaveBeenRemovedFromWord(Word word, Set<EnglishWord> updatedEnglishWords) {
         for (EnglishWord englishWord : word.getEnglishWord()) {
             if (!updatedEnglishWords.contains(englishWord)) {
                 // Remove mapping from database
-                removeWordFromEnglishWordTranslation(englishWord, word);
+                removeWordMappingFromEnglishWords(englishWord, word);
             }
         }
     }
 
-    public void removeWordFromEnglishWordTranslation(EnglishWord english, Word word) {
+    private void removeWordMappingFromEnglishWords(EnglishWord english, Word word) {
         Collection<Word> wordsForEnglishWord = english.getWord();
         wordsForEnglishWord.removeIf(matchingWord -> matchingWord.getEnglishWord().equals(word.getEnglishWord()));
         english.setWord(wordsForEnglishWord);
         englishWordRepository.save(english);
-    }
-
-    public void dealWithEnglishWordsInRepository(Set<EnglishWord> englishWords) {
-        englishWords.forEach(englishWord -> {
-            boolean englishWordExits = englishWordRepository.existsByEnglishWord(englishWord.getEnglishWord());
-            if (!englishWordExits) {
-                EnglishWord newEnglishWord = new EnglishWord(englishWord.getEnglishWord());
-                englishWordRepository.save(newEnglishWord);
-                englishWord.setId(newEnglishWord.getId());
-                englishWord.setEnglishWord(newEnglishWord.getEnglishWord());
-            } else {
-                Optional<EnglishWord> englishFromDb = englishWordRepository.findByEnglishWord(englishWord.getEnglishWord());
-                englishFromDb.ifPresent(value -> {
-                    englishWord.setId(value.getId());
-                    englishWord.setEnglishWord(value.getEnglishWord());
-                });
-            }
-        });
     }
 
 }
