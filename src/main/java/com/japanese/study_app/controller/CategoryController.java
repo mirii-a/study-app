@@ -48,7 +48,7 @@ public class CategoryController {
     @GetMapping("/get/category/id/{id}")
     public ResponseEntity<ApiResponse> getCategoryById(@PathVariable Long id){
         try {
-            CategoryDto category = categoryService.getCategoryById(id);
+            CategoryDto category = categoryService.getCategoryDtoById(id);
             return ResponseEntity.ok(new ApiResponse("Category retrieved successfully.", category));
         } catch (CategoryNotFoundException e) {
             return ResponseEntity.status(NOT_FOUND).body(new ApiResponse(e.getMessage(), null));

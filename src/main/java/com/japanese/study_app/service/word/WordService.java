@@ -5,12 +5,12 @@ import com.japanese.study_app.exceptions.AlreadyExistsException;
 import com.japanese.study_app.exceptions.CategoryNotFoundException;
 import com.japanese.study_app.exceptions.WordNotFoundException;
 import com.japanese.study_app.model.*;
-import com.japanese.study_app.repository.CategoryRepository;
 import com.japanese.study_app.repository.ExampleSentenceRepository;
 import com.japanese.study_app.repository.WordDefinitionRepository;
 import com.japanese.study_app.repository.WordRepository;
 import com.japanese.study_app.request.AddWordRequest;
 import com.japanese.study_app.request.UpdateWordRequest;
+import com.japanese.study_app.service.category.CategoryService;
 import com.japanese.study_app.service.englishWord.EnglishWordService;
 import org.springframework.stereotype.Service;
 
@@ -22,19 +22,19 @@ import java.util.stream.Collectors;
 public class WordService implements IWordService {
 
     private final WordRepository wordRepository;
-    private final CategoryRepository categoryRepository;
+    private final CategoryService categoryService;
     private final EnglishWordService englishWordService;
     private final WordDefinitionRepository wordDefinitionRepository;
     private final ExampleSentenceRepository exampleSentenceRepository;
 
     public WordService(WordRepository wordRepository,
-                       CategoryRepository categoryRepository,
+                       CategoryService categoryService,
                        EnglishWordService englishWordService,
                        WordDefinitionRepository wordDefinitionRepository,
                        ExampleSentenceRepository exampleSentenceRepository
     ) {
         this.wordRepository = wordRepository;
-        this.categoryRepository = categoryRepository;
+        this.categoryService = categoryService;
         this.englishWordService = englishWordService;
         this.wordDefinitionRepository = wordDefinitionRepository;
         this.exampleSentenceRepository = exampleSentenceRepository;
@@ -50,7 +50,7 @@ public class WordService implements IWordService {
         Word newWord = wordRepository.save(createWord(request));
 
         englishWordService.addWordToEnglishWordTranslations(newWord);
-        addWordToCategoryMapping(newWord);
+        categoryService.addWordToCategoryMapping(newWord);
 
         Map<String, Set<String>> definitions = request.definitions();
         dealWithDefinitions(newWord, definitions);
@@ -67,7 +67,7 @@ public class WordService implements IWordService {
 
     private Word createWord(AddWordRequest request) {
         Set<EnglishWord> englishWords = englishWordService.dealWithEnglishWords(request);
-        Set<Category> categories = dealWithCategories(request);
+        Set<Category> categories = categoryService.dealWithCategories(request.category());
 
         return new Word(
                 request.japaneseWord(),
@@ -75,30 +75,6 @@ public class WordService implements IWordService {
                 request.hiragana(),
                 categories
         );
-    }
-
-    private Set<Category> dealWithCategories(AddWordRequest request) {
-        Set<Category> categories = request.category();
-        dealWithCategoriesInRepository(categories);
-        return categories;
-    }
-
-    private void dealWithCategoriesInRepository(Set<Category> categoryInput) {
-        categoryInput.forEach(category -> {
-            boolean categoryExists = categoryRepository.existsByName(category.getName());
-            if (!categoryExists) {
-                Category newCategory = new Category(category.getName());
-                categoryRepository.save(newCategory);
-                category.setId(newCategory.getId());
-                category.setName(newCategory.getName());
-            } else {
-                Optional<Category> categoryFromDb = categoryRepository.findByName(category.getName());
-                categoryFromDb.ifPresent(value -> {
-                    category.setId(value.getId());
-                    category.setName(value.getName());
-                });
-            }
-        });
     }
 
     private void dealWithExampleSentences(Word word, Set<Map<String, String>> exampleSentences) {
@@ -278,9 +254,9 @@ public class WordService implements IWordService {
             }
         }
 
-        for (Category category : word.getCategory()) {
-            removeWordFromCategory(category, word);
-        }
+        word.getCategory().forEach(
+                category ->
+                        categoryService.removeWordFromCategory(category, word));
 
         word.getEnglishWord().forEach(
                 englishWord ->
@@ -294,13 +270,8 @@ public class WordService implements IWordService {
             throw new WordNotFoundException("No word '" + request.japaneseWord() + "' found to update.");
         }
         // update the database entries as needed
-        Set<Category> updatedCategories = request.category();
-        checkIfCategoriesHaveBeenRemoved(wordToUpdate, updatedCategories);
-        dealWithCategoriesInRepository(updatedCategories);
-        wordToUpdate.setCategory(updatedCategories);
-        // Ensure that the new Category (if any) has the new word set
-        addWordToCategoryMapping(wordToUpdate);
 
+        wordToUpdate = categoryService.updateCategories(wordToUpdate, request.category());
         wordToUpdate = englishWordService.updateEnglishWords(wordToUpdate, request.englishWord());
 
         wordToUpdate.setHiragana(request.hiragana());
@@ -346,9 +317,7 @@ public class WordService implements IWordService {
 
     @Override
     public List<WordDto> getWordsByCategory(String category) {
-        if (!categoryRepository.existsByName(category)) {
-            throw new CategoryNotFoundException("No category with name " + category + " found.");
-        }
+        checkIfCategoryExists(category);
 
         List<Word> words = wordRepository.findByCategoryName(category);
         if (words.isEmpty()) {
@@ -361,9 +330,7 @@ public class WordService implements IWordService {
     @Override
     public List<WordDto> getWordsByHiraganaAndCategory(String hiragana, String category) {
         // search if category exists
-        if (!categoryRepository.existsByName(category)) {
-            throw new CategoryNotFoundException("No category with name " + category + " found.");
-        }
+        checkIfCategoryExists(category);
         // search if hiragana exists
         List<Word> wordsWithHiragana = wordRepository.findByHiragana(hiragana);
         if (wordsWithHiragana.isEmpty()) {
@@ -385,9 +352,8 @@ public class WordService implements IWordService {
 
     @Override
     public List<WordDto> getWordsByEnglishWordAndCategory(String englishWord, String category) {
-        if (!categoryRepository.existsByName(category)) {
-            throw new CategoryNotFoundException("No category with name '" + category + "' found.");
-        }
+        checkIfCategoryExists(category);
+
         if (!englishWordService.checkIfWordExistsByEnglishWord(englishWord)) {
             throw new WordNotFoundException("No English word '" + englishWord + "' found. Please try again.");
         }
@@ -467,42 +433,16 @@ public class WordService implements IWordService {
         return wordDto;
     }
 
-    private void addWordToCategoryMapping(Word word) {
-        List<Category> newCategories = word.getCategory().stream()
-                .map(category -> categoryRepository.findById(category.getId())
-                        .orElseThrow(() -> new CategoryNotFoundException("Category with id " + category.getId() + " not found.")))
-                .toList();
-
-        newCategories.forEach(category -> {
-            Collection<Word> words = category.getWords();
-            if (!words.contains(word)) {
-                words.add(word);
-                category.setWords(words);
-                categoryRepository.save(category);
-            }
-        });
-    }
-
-    private void checkIfCategoriesHaveBeenRemoved(Word word, Set<Category> updatedCategoryList) {
-        for (Category category : word.getCategory()) {
-            if (!updatedCategoryList.contains(category)) {
-                // Remove mapping from database
-                removeWordFromCategory(category, word);
-            }
-        }
-    }
-
-    private void removeWordFromCategory(Category category, Word word) {
-        Collection<Word> wordsForCategory = category.getWords();
-        wordsForCategory.removeIf(wordInCategory -> wordInCategory.getJapaneseWord().equals(word.getJapaneseWord()));
-        category.setWords(wordsForCategory);
-        categoryRepository.save(category);
-    }
-
     private List<String> convertDefinitionsToListOfStringsForDtoOutput(String[] definitions) {
         List<String> listOfDefinitions = new ArrayList<>();
         listOfDefinitions.addAll(Arrays.stream(definitions).toList());
         return listOfDefinitions;
+    }
+
+    private void checkIfCategoryExists(String category) {
+        if (!categoryService.checkIfCategoryExistsByName(category)) {
+            throw new CategoryNotFoundException("No category with name '" + category + "' found.");
+        }
     }
 
 }
