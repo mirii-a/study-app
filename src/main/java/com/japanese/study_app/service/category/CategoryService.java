@@ -106,11 +106,6 @@ public class CategoryService implements ICategoryService {
 //        return new Category();
 //    }
 
-//    @Override
-//    public Category updateCategoryName(Category category, Long id) {
-//        return null;
-//    }
-
     @Override
     public void deleteCategoryById(Long id) {
         categoryRepository.findById(id)

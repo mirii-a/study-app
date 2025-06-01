@@ -23,7 +23,6 @@ public interface ICategoryService {
     
     CategoryDto addCategory(AddCategoryRequest category);
 //    Category updateCategoryContents(Category category);
-//    Category updateCategoryName(Category category, Long id);
     void deleteCategoryById(Long id);
     void deleteCategoryByName(String name);
     boolean checkIfCategoryExistsByName(String category);
