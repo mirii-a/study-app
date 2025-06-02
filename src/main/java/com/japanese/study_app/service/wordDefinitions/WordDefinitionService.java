@@ -59,8 +59,8 @@ public class WordDefinitionService {
         }
     }
 
-    public void removeDefinitionsForWord(WordDefinition wordDefinitions) {
-        Optional.ofNullable(wordDefinitions).ifPresent(wordDefinitionRepository::delete);
+    public void removeDefinitionsForWord(Word word) {
+        Optional.ofNullable(word.getDefinitions()).ifPresent(wordDefinitionRepository::delete);
     }
 
     private String buildStringForDefinition(Set<String> definitions) {
