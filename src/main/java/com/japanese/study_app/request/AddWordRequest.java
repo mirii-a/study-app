@@ -13,7 +13,7 @@ public record AddWordRequest(
         Set<EnglishWord> englishWord,
         String hiragana,
         Set<Map<String, String>> exampleSentence,
-        Map<String, Set<String>> definitions,
+        RequestWordDefinitions definitions,
         Set<Category> category
 ) {
 

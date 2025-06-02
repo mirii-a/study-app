@@ -7,7 +7,7 @@ import com.japanese.study_app.model.Category;
 import com.japanese.study_app.model.Word;
 import com.japanese.study_app.repository.CategoryRepository;
 import com.japanese.study_app.request.AddCategoryRequest;
-import com.japanese.study_app.service.word.WordService;
+import com.japanese.study_app.service.word.WordDtoService;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
@@ -20,11 +20,11 @@ import java.util.stream.Collectors;
 public class CategoryService implements ICategoryService {
 
     private final CategoryRepository categoryRepository;
-    private final WordService wordService;
+    private final WordDtoService wordDtoService;
 
-    public CategoryService(CategoryRepository categoryRepository, WordService wordService) {
+    public CategoryService(CategoryRepository categoryRepository, WordDtoService wordDtoService) {
         this.categoryRepository = categoryRepository;
-        this.wordService = wordService;
+        this.wordDtoService = wordDtoService;
     }
 
     @Override
@@ -149,7 +149,7 @@ public class CategoryService implements ICategoryService {
         return new CategoryDto(
                 category.getId(),
                 category.getName(),
-                category.getWords().stream().map(wordService::convertWordToDto).collect(Collectors.toList())
+                category.getWords().stream().map(wordDtoService::convertWordToDto).collect(Collectors.toList())
         );
     }
 
@@ -168,4 +168,6 @@ public class CategoryService implements ICategoryService {
         category.setWords(wordsForCategory);
         categoryRepository.save(category);
     }
+
+
 }

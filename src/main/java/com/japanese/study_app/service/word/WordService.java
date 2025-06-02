@@ -4,14 +4,17 @@ import com.japanese.study_app.dto.WordDto;
 import com.japanese.study_app.exceptions.AlreadyExistsException;
 import com.japanese.study_app.exceptions.CategoryNotFoundException;
 import com.japanese.study_app.exceptions.WordNotFoundException;
-import com.japanese.study_app.model.*;
+import com.japanese.study_app.model.Category;
+import com.japanese.study_app.model.EnglishWord;
+import com.japanese.study_app.model.ExampleSentence;
+import com.japanese.study_app.model.Word;
 import com.japanese.study_app.repository.ExampleSentenceRepository;
-import com.japanese.study_app.repository.WordDefinitionRepository;
 import com.japanese.study_app.repository.WordRepository;
 import com.japanese.study_app.request.AddWordRequest;
 import com.japanese.study_app.request.UpdateWordRequest;
 import com.japanese.study_app.service.category.CategoryService;
 import com.japanese.study_app.service.englishWord.EnglishWordService;
+import com.japanese.study_app.service.wordDefinitions.WordDefinitionService;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -24,20 +27,23 @@ public class WordService implements IWordService {
     private final WordRepository wordRepository;
     private final CategoryService categoryService;
     private final EnglishWordService englishWordService;
-    private final WordDefinitionRepository wordDefinitionRepository;
+    private final WordDefinitionService wordDefinitionService;
     private final ExampleSentenceRepository exampleSentenceRepository;
+    private final WordDtoService wordDtoService;
 
     public WordService(WordRepository wordRepository,
                        CategoryService categoryService,
                        EnglishWordService englishWordService,
-                       WordDefinitionRepository wordDefinitionRepository,
-                       ExampleSentenceRepository exampleSentenceRepository
+                       WordDefinitionService wordDefinitionService,
+                       ExampleSentenceRepository exampleSentenceRepository,
+                       WordDtoService wordDtoService
     ) {
         this.wordRepository = wordRepository;
         this.categoryService = categoryService;
         this.englishWordService = englishWordService;
-        this.wordDefinitionRepository = wordDefinitionRepository;
+        this.wordDefinitionService = wordDefinitionService;
         this.exampleSentenceRepository = exampleSentenceRepository;
+        this.wordDtoService = wordDtoService;
 
     }
 
@@ -52,13 +58,12 @@ public class WordService implements IWordService {
         englishWordService.addWordToEnglishWordTranslations(newWord);
         categoryService.addWordToCategoryMapping(newWord);
 
-        Map<String, Set<String>> definitions = request.definitions();
-        dealWithDefinitions(newWord, definitions);
+        wordDefinitionService.dealWithDefinitions(newWord, request.definitions());
 
         Set<Map<String, String>> exampleSentences = request.exampleSentence();
         dealWithExampleSentences(newWord, exampleSentences);
 
-        return convertWordToDto(newWord);
+        return wordDtoService.convertWordToDto(newWord);
     }
 
     private boolean wordExists(String japaneseWord) {
@@ -168,53 +173,9 @@ public class WordService implements IWordService {
         word.setExampleSentences(blankExamples);
     }
 
-    private void dealWithDefinitions(Word word, Map<String, Set<String>> definitions) {
-        // Updates the Word object so no need to return anything
-        WordDefinition wordDefinition = new WordDefinition();
-
-        if (definitions != null) {
-            // Get Japanese definitions and make them into one string
-            if (wordDefinitionRepository.findByWord(word) != null) {
-                wordDefinition = wordDefinitionRepository.findByWord(word);
-            }
-
-            StringBuilder japaneseDefinitionStringBuilder = new StringBuilder();
-
-            for (String japaneseDefinition : definitions.get("japanese")) {
-                japaneseDefinitionStringBuilder.append(japaneseDefinition).append(";");
-            }
-
-            String japaneseDefinitions = japaneseDefinitionStringBuilder.toString();
-            wordDefinition.setDefinitionJapanese(japaneseDefinitions);
-
-            // Get English definitions and make them into one string
-            StringBuilder englishDefinitionStringBuilder = new StringBuilder();
-
-            for (String englishDefinition : definitions.get("english")) {
-                englishDefinitionStringBuilder.append(englishDefinition).append(";");
-            }
-
-            String englishDefinitions = englishDefinitionStringBuilder.toString();
-            wordDefinition.setDefinitionEnglish(englishDefinitions);
-
-            wordDefinition.setWord(word);
-
-            wordDefinitionRepository.save(wordDefinition);
-
-            WordDefinition wordDefinitionsForWord = wordDefinitionRepository.findByWord(word);
-            word.setDefinitions(wordDefinitionsForWord);
-        } else {
-            // Set as blank list as there are no definitions
-            // Nothing to save to the database
-            wordDefinition.setDefinitionEnglish("");
-            wordDefinition.setDefinitionJapanese("");
-            word.setDefinitions(wordDefinition);
-        }
-    }
-
     @Override
     public WordDto getWordById(Long id) {
-        return wordRepository.findById(id).map(this::convertWordToDto)
+        return wordRepository.findById(id).map(wordDtoService::convertWordToDto)
                 .orElseThrow(() -> new WordNotFoundException("Word with given ID not found!"));
     }
 
@@ -244,15 +205,11 @@ public class WordService implements IWordService {
     }
 
     private void prepareToDeleteWordByDeletingForeignKeyData(Word word) {
-        if (word.getDefinitions() != null) {
-            wordDefinitionRepository.delete(word.getDefinitions());
-        }
 
-        if (word.getExampleSentences() != null) {
-            for (ExampleSentence sentence : word.getExampleSentences()) {
-                exampleSentenceRepository.delete(sentence);
-            }
-        }
+        wordDefinitionService.removeDefinitionsForWord(word.getDefinitions());
+
+        Optional.ofNullable(word.getExampleSentences())
+                .ifPresent(sentences -> sentences.forEach(exampleSentenceRepository::delete));
 
         word.getCategory().forEach(
                 category ->
@@ -279,19 +236,18 @@ public class WordService implements IWordService {
 
         wordRepository.save(wordToUpdate);
 
-        Map<String, Set<String>> definitions = request.definitions();
-        dealWithDefinitions(wordToUpdate, definitions);
+        wordDefinitionService.dealWithDefinitions(wordToUpdate, request.definitions());
 
         Set<Map<String, String>> exampleSentences = request.exampleSentence();
         dealWithExampleSentences(wordToUpdate, exampleSentences);
 
-        return convertWordToDto(wordToUpdate);
+        return wordDtoService.convertWordToDto(wordToUpdate);
     }
 
     @Override
     public WordDto getWordByJapaneseWord(String japaneseWord) {
         Word word = wordRepository.findByJapaneseWord(japaneseWord);
-        return convertWordToDto(word);
+        return wordDtoService.convertWordToDto(word);
     }
 
     @Override
@@ -301,7 +257,7 @@ public class WordService implements IWordService {
             // this should return 200 empty status?
             throw new WordNotFoundException("No words matching " + englishWord + " found. Please try again.");
         }
-        return words.stream().map(this::convertWordToDto).collect(Collectors.toList());
+        return words.stream().map(wordDtoService::convertWordToDto).collect(Collectors.toList());
 
     }
 
@@ -312,7 +268,7 @@ public class WordService implements IWordService {
             // this should return 200 empty status?
             throw new WordNotFoundException("No words matching " + hiragana + " found. Please try again.");
         }
-        return words.stream().map(this::convertWordToDto).collect(Collectors.toList());
+        return words.stream().map(wordDtoService::convertWordToDto).collect(Collectors.toList());
     }
 
     @Override
@@ -324,7 +280,7 @@ public class WordService implements IWordService {
             // this should return 200 empty status?
             throw new WordNotFoundException("No words with the category " + category + " have been found. Please add some words to this category and try again.");
         }
-        return words.stream().map(this::convertWordToDto).collect(Collectors.toList());
+        return words.stream().map(wordDtoService::convertWordToDto).collect(Collectors.toList());
     }
 
     @Override
@@ -347,7 +303,7 @@ public class WordService implements IWordService {
             }
         });
 
-        return filteredWords.stream().map(this::convertWordToDto).collect(Collectors.toList());
+        return filteredWords.stream().map(wordDtoService::convertWordToDto).collect(Collectors.toList());
     }
 
     @Override
@@ -377,66 +333,13 @@ public class WordService implements IWordService {
             // this should return 200 empty status?
             throw new WordNotFoundException("No words matching '" + englishWord + "' and category '" + category + "' have been found.");
         }
-        return filteredWords.stream().map(this::convertWordToDto).collect(Collectors.toList());
+        return filteredWords.stream().map(wordDtoService::convertWordToDto).collect(Collectors.toList());
     }
 
     @Override
     public List<WordDto> getAllWords() {
         List<Word> words = wordRepository.findAll();
-        return words.stream().map(this::convertWordToDto).collect(Collectors.toList());
-    }
-
-    @Override
-    public WordDto convertWordToDto(Word word) {
-        WordDto wordDto = new WordDto(
-                word.getId(),
-                word.getJapaneseWord(),
-                word.getEnglishWord().stream().map(EnglishWord::getEnglishWord).collect(Collectors.toList()),
-                word.getHiragana(),
-                word.getCategory().stream().map(Category::getName).collect(Collectors.toList())
-        );
-
-        if (word.getDefinitions() != null) {
-            WordDefinition definitionsForWord = word.getDefinitions();
-
-            List<String> allEnglishDefinitions = convertDefinitionsToListOfStringsForDtoOutput(
-                    definitionsForWord.getDefinitionEnglish().split(";"));
-            List<String> allJapaneseDefinitions = convertDefinitionsToListOfStringsForDtoOutput(
-                    definitionsForWord.getDefinitionJapanese().split(";"));
-
-            wordDto = setDefinitionsForWordDto(wordDto, allEnglishDefinitions, allJapaneseDefinitions);
-        } else {
-            List<String> blankList = new ArrayList<>();
-            wordDto = setDefinitionsForWordDto(wordDto, blankList, blankList);
-        }
-
-        if (word.getExampleSentences() != null) {
-            Collection<ExampleSentence> exampleSentences = word.getExampleSentences();
-            List<Map<String, String>> examplesForWord = new ArrayList<>();
-            for (ExampleSentence sentence : exampleSentences) {
-                Map<String, String> example = new HashMap<>();
-                example.put("englishSentence", sentence.getEnglishSentence());
-                example.put("japaneseSentence", sentence.getJapaneseSentence());
-                examplesForWord.add(example);
-            }
-            wordDto = wordDto.updateExampleSentences(examplesForWord);
-        } else {
-            List<Map<String, String>> blankList = new ArrayList<>();
-            wordDto = wordDto.updateExampleSentences(blankList);
-        }
-        return wordDto;
-    }
-
-    private WordDto setDefinitionsForWordDto(WordDto wordDto, List<String> englishDefinitions, List<String> japaneseDefinitions) {
-        wordDto = wordDto.updateEnglishDefinitions(englishDefinitions);
-        wordDto = wordDto.updateJapaneseDefinitions(japaneseDefinitions);
-        return wordDto;
-    }
-
-    private List<String> convertDefinitionsToListOfStringsForDtoOutput(String[] definitions) {
-        List<String> listOfDefinitions = new ArrayList<>();
-        listOfDefinitions.addAll(Arrays.stream(definitions).toList());
-        return listOfDefinitions;
+        return words.stream().map(wordDtoService::convertWordToDto).collect(Collectors.toList());
     }
 
     private void checkIfCategoryExists(String category) {
