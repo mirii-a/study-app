@@ -9,6 +9,7 @@ import com.japanese.study_app.model.EnglishWord;
 import com.japanese.study_app.model.Word;
 import com.japanese.study_app.repository.WordRepository;
 import com.japanese.study_app.request.AddWordRequest;
+import com.japanese.study_app.request.RequestWordExampleSentences;
 import com.japanese.study_app.request.UpdateWordRequest;
 import com.japanese.study_app.service.category.CategoryService;
 import com.japanese.study_app.service.englishWord.EnglishWordService;
@@ -59,7 +60,7 @@ public class WordService implements IWordService {
 
         wordDefinitionService.dealWithDefinitions(newWord, request.definitions());
 
-        Set<Map<String, String>> exampleSentences = request.exampleSentence();
+        Set<RequestWordExampleSentences> exampleSentences = request.exampleSentence();
         exampleSentenceService.dealWithExampleSentences(newWord, exampleSentences);
 
         return wordDtoService.convertWordToDto(newWord);
@@ -145,7 +146,7 @@ public class WordService implements IWordService {
 
         wordDefinitionService.dealWithDefinitions(wordToUpdate, request.definitions());
 
-        Set<Map<String, String>> exampleSentences = request.exampleSentence();
+        Set<RequestWordExampleSentences> exampleSentences = request.exampleSentence();
         exampleSentenceService.dealWithExampleSentences(wordToUpdate, exampleSentences);
 
         return wordDtoService.convertWordToDto(wordToUpdate);

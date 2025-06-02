@@ -4,6 +4,7 @@ import com.japanese.study_app.exceptions.ExampleSentenceNotFoundException;
 import com.japanese.study_app.model.ExampleSentence;
 import com.japanese.study_app.model.Word;
 import com.japanese.study_app.repository.ExampleSentenceRepository;
+import com.japanese.study_app.request.RequestWordExampleSentences;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -36,18 +37,18 @@ public class ExampleSentenceService implements IExampleSentenceService {
                 .ifPresent(sentences -> sentences.forEach(exampleSentenceRepository::delete));
     }
 
-    public void dealWithExampleSentences(Word word, Set<Map<String, String>> exampleSentences) {
+    public void dealWithExampleSentences(Word word, Set<RequestWordExampleSentences> exampleSentences) {
         // TODO: Add better validation when wanting to update a word. Separate out this logic
         if (exampleSentences != null) {
             exampleSentences.forEach(example -> {
-                if (!Objects.equals(example.get("japaneseSentence"), "") && example.get("japaneseSentence") != null) {
-                    if (exampleSentenceRepository.existsByJapaneseSentence(example.get("japaneseSentence"))) {
+                if (!Objects.equals(example.japaneseSentence(), "") && example.japaneseSentence() != null) {
+                    if (exampleSentenceRepository.existsByJapaneseSentence(example.japaneseSentence())) {
                         ExampleSentence sentenceExample = new ExampleSentence();
-                        Optional<ExampleSentence> sentenceAlreadyExisting = exampleSentenceRepository.findByJapaneseSentence(example.get("japaneseSentence"));
+                        Optional<ExampleSentence> sentenceAlreadyExisting = exampleSentenceRepository.findByJapaneseSentence(example.japaneseSentence());
                         sentenceAlreadyExisting.ifPresent(value -> {
-                            if (!value.getEnglishSentence().equals(example.get("englishSentence"))) {
+                            if (!value.getEnglishSentence().equals(example.englishSentence())) {
                                 sentenceExample.setJapaneseSentence(value.getJapaneseSentence());
-                                sentenceExample.setEnglishSentence(example.get("englishSentence"));
+                                sentenceExample.setEnglishSentence(example.englishSentence());
                                 sentenceExample.setId(value.getId());
                             } else {
                                 sentenceExample.setJapaneseSentence(value.getJapaneseSentence());
@@ -56,8 +57,8 @@ public class ExampleSentenceService implements IExampleSentenceService {
                             }
                             Collection<Word> words = value.getWords();
 
-                            if (!example.get("englishSentence").equals(value.getEnglishSentence())) {
-                                value.setEnglishSentence(example.get("englishSentence"));
+                            if (!example.englishSentence().equals(value.getEnglishSentence())) {
+                                value.setEnglishSentence(example.englishSentence());
                                 if (!words.contains(word)) {
                                     words.add(word);
                                     value.setWords(words);
@@ -68,12 +69,12 @@ public class ExampleSentenceService implements IExampleSentenceService {
                             Collection<ExampleSentence> exampleSentencesForWord = exampleSentenceRepository.findByWords(word);
                             word.setExampleSentences(exampleSentencesForWord);
                         });
-                    } else if (exampleSentenceRepository.existsByEnglishSentence(example.get("englishSentence")) && !exampleSentenceRepository.existsByJapaneseSentence(example.get("japaneseSentence"))) {
+                    } else if (exampleSentenceRepository.existsByEnglishSentence(example.englishSentence()) && !exampleSentenceRepository.existsByJapaneseSentence(example.japaneseSentence())) {
                         ExampleSentence sentenceExample = new ExampleSentence();
-                        Optional<ExampleSentence> sentenceAlreadyExisting = exampleSentenceRepository.findByEnglishSentence(example.get("englishSentence"));
+                        Optional<ExampleSentence> sentenceAlreadyExisting = exampleSentenceRepository.findByEnglishSentence(example.englishSentence());
                         sentenceAlreadyExisting.ifPresent(value -> {
-                            if (!value.getJapaneseSentence().equals(example.get("japaneseSentence"))) {
-                                sentenceExample.setJapaneseSentence(example.get("japaneseSentence"));
+                            if (!value.getJapaneseSentence().equals(example.japaneseSentence())) {
+                                sentenceExample.setJapaneseSentence(example.japaneseSentence());
                                 sentenceExample.setEnglishSentence(value.getEnglishSentence());
                                 sentenceExample.setId(value.getId());
                             } else {
@@ -83,8 +84,8 @@ public class ExampleSentenceService implements IExampleSentenceService {
                             }
                             Collection<Word> words = value.getWords();
 
-                            if (!example.get("japaneseSentence").equals(value.getJapaneseSentence())) {
-                                value.setJapaneseSentence(example.get("japaneseSentence"));
+                            if (!example.japaneseSentence().equals(value.getJapaneseSentence())) {
+                                value.setJapaneseSentence(example.japaneseSentence());
                                 if (!words.contains(word)) {
                                     words.add(word);
                                     value.setWords(words);
@@ -96,8 +97,8 @@ public class ExampleSentenceService implements IExampleSentenceService {
                         });
                     } else {
                         ExampleSentence sentenceExample = new ExampleSentence();
-                        sentenceExample.setEnglishSentence(example.get("englishSentence"));
-                        sentenceExample.setJapaneseSentence(example.get("japaneseSentence"));
+                        sentenceExample.setEnglishSentence(example.englishSentence());
+                        sentenceExample.setJapaneseSentence(example.japaneseSentence());
                         Collection<Word> words = new HashSet<>();
                         // Add word to mapping for this new example sentence
                         words.add(word);
