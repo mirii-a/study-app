@@ -5,6 +5,6 @@ import com.japanese.study_app.model.WordDefinition;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 
-public interface WordDefinitionRepository extends JpaRepository<WordDefinition, Long>{
+public interface WordDefinitionRepository extends JpaRepository<WordDefinition, Long> {
     WordDefinition findByWord(Word word);
 }

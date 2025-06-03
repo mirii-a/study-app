@@ -6,11 +6,11 @@ import com.japanese.study_app.model.ExampleSentence;
 import com.japanese.study_app.model.Word;
 import com.japanese.study_app.repository.ExampleSentenceRepository;
 import com.japanese.study_app.request.RequestWordExampleSentences;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.LogManager;
 
 @Service
 public class ExampleSentenceService implements IExampleSentenceService {
@@ -52,16 +52,18 @@ public class ExampleSentenceService implements IExampleSentenceService {
                 if (exampleSentenceRepository.existsByJapaneseSentence(newExample.japaneseSentence())
                         && exampleSentenceRepository.existsByEnglishSentence(newExample.englishSentence())) {
                     log.info("Both Japanese and English example sentences already exist in the repository. Skipping...");
-                }
-                else {
+                } else {
                     if (!Objects.equals(newExample.japaneseSentence(), "")) {
-                        if (exampleSentenceRepository.existsByJapaneseSentence(newExample.japaneseSentence()) && !exampleSentenceRepository.existsByEnglishSentence(newExample.englishSentence())) {
+                        if (exampleSentenceRepository.existsByJapaneseSentence(newExample.japaneseSentence())
+                                && !exampleSentenceRepository.existsByEnglishSentence(newExample.englishSentence())) {
                             updateEnglishExampleSentenceAsJapaneseSentenceHasNotChanged(word, newExample);
-                        } else if (exampleSentenceRepository.existsByEnglishSentence(newExample.englishSentence()) && !exampleSentenceRepository.existsByJapaneseSentence(newExample.japaneseSentence())) {
+                        } else if (exampleSentenceRepository.existsByEnglishSentence(newExample.englishSentence())
+                                && !exampleSentenceRepository.existsByJapaneseSentence(newExample.japaneseSentence())) {
                             updateJapaneseExampleSentenceAsEnglishSentenceHasNotChanged(word, newExample);
                         } else {
                             addNewExampleSentenceToRepo(word, newExample);
-                            Collection<ExampleSentence> exampleSentencesForWord = exampleSentenceRepository.findByWords(word);
+                            Collection<ExampleSentence> exampleSentencesForWord
+                                    = exampleSentenceRepository.findByWords(word);
                             word.setExampleSentences(exampleSentencesForWord);
                         }
                     } else {
@@ -97,9 +99,11 @@ public class ExampleSentenceService implements IExampleSentenceService {
         word.setExampleSentences(blankExamples);
     }
 
-    private void updateEnglishExampleSentenceAsJapaneseSentenceHasNotChanged(Word word, RequestWordExampleSentences newExampleSentence) {
+    private void updateEnglishExampleSentenceAsJapaneseSentenceHasNotChanged(
+            Word word, RequestWordExampleSentences newExampleSentence) {
         ExampleSentence sentenceExample = new ExampleSentence();
-        Optional<ExampleSentence> sentenceAlreadyExisting = exampleSentenceRepository.findByJapaneseSentence(newExampleSentence.japaneseSentence());
+        Optional<ExampleSentence> sentenceAlreadyExisting
+                = exampleSentenceRepository.findByJapaneseSentence(newExampleSentence.japaneseSentence());
         sentenceAlreadyExisting.ifPresent(existingSentence -> {
             if (englishSentenceHasBeenUpdated(
                     existingSentence.getEnglishSentence(), newExampleSentence.englishSentence())) {
@@ -128,9 +132,11 @@ public class ExampleSentenceService implements IExampleSentenceService {
         });
     }
 
-    private void updateJapaneseExampleSentenceAsEnglishSentenceHasNotChanged(Word word, RequestWordExampleSentences newExampleSentence) {
+    private void updateJapaneseExampleSentenceAsEnglishSentenceHasNotChanged(
+            Word word, RequestWordExampleSentences newExampleSentence) {
         ExampleSentence sentenceExample = new ExampleSentence();
-        Optional<ExampleSentence> sentenceAlreadyExisting = exampleSentenceRepository.findByEnglishSentence(newExampleSentence.englishSentence());
+        Optional<ExampleSentence> sentenceAlreadyExisting = exampleSentenceRepository.findByEnglishSentence(
+                newExampleSentence.englishSentence());
         sentenceAlreadyExisting.ifPresent(existingSentence -> {
             if (japaneseSentenceHasBeenUpdated(
                     existingSentence.getJapaneseSentence(), newExampleSentence.japaneseSentence())) {

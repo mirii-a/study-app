@@ -44,7 +44,8 @@ public class EnglishWordService {
     }
 
     public EnglishWord findEnglishWordById(Long wordId) {
-        return englishWordRepository.findById(wordId).orElseThrow(() -> new WordNotFoundException("English word with id " + wordId + " not found."));
+        return englishWordRepository.findById(wordId).orElseThrow(
+                () -> new WordNotFoundException("English word with id " + wordId + " not found."));
     }
 
     public void addWordToEnglishWordTranslations(Word word) {
@@ -70,7 +71,8 @@ public class EnglishWordService {
                 englishWord.setId(newEnglishWord.getId());
                 englishWord.setEnglishWord(newEnglishWord.getEnglishWord());
             } else {
-                Optional<EnglishWord> existingEnglishWord = englishWordRepository.findByEnglishWord(englishWord.getEnglishWord());
+                Optional<EnglishWord> existingEnglishWord =
+                        englishWordRepository.findByEnglishWord(englishWord.getEnglishWord());
                 existingEnglishWord.ifPresent(value -> {
                     // Updates the IDs of the English words if they already exist for the Word
                     englishWord.setId(value.getId());
