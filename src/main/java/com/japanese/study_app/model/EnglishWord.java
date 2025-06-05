@@ -20,9 +20,10 @@ public class EnglishWord {
     )
     private Collection<Word> word = new HashSet<>();
 
-    public EnglishWord() {}
+    public EnglishWord() {
+    }
 
-    public EnglishWord(String englishWord){
+    public EnglishWord(String englishWord) {
         this.englishWord = englishWord;
     }
 

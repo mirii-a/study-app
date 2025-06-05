@@ -7,6 +7,7 @@ import java.util.List;
 public interface IExampleSentenceService {
 
     List<ExampleSentence> getAllExampleSentences();
+
     void deleteExampleSentenceById(Long id);
 
 }

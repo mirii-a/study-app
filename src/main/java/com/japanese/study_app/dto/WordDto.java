@@ -14,23 +14,27 @@ public record WordDto(
         List<Map<String, String>> exampleSentences
 ) {
 
-    public WordDto {}
+    public WordDto {
+    }
 
     public WordDto(Long id, String japaneseWord, List<String> englishWord, String hiragana, List<String> categories) {
         this(id, japaneseWord, englishWord, hiragana, categories, List.of(), List.of(), List.of());
     }
 
-    public WordDto updateExampleSentences(List<Map<String,String>> newExampleSentences) {
-        return new WordDto(id, japaneseWord, englishWord, hiragana, categories, englishDefinitions, japaneseDefinitions, newExampleSentences);
+    public WordDto updateExampleSentences(List<Map<String, String>> newExampleSentences) {
+        return new WordDto(id, japaneseWord, englishWord, hiragana, categories, englishDefinitions,
+                japaneseDefinitions, newExampleSentences);
     }
 
     public WordDto updateEnglishDefinitions(List<String> newEnglishDefinitions) {
-        return new WordDto(id, japaneseWord, englishWord, hiragana, categories, newEnglishDefinitions, japaneseDefinitions, exampleSentences);
+        return new WordDto(id, japaneseWord, englishWord, hiragana, categories, newEnglishDefinitions,
+                japaneseDefinitions, exampleSentences);
 
     }
 
     public WordDto updateJapaneseDefinitions(List<String> newJapaneseDefinitions) {
-        return new WordDto(id, japaneseWord, englishWord, hiragana, categories, englishDefinitions, newJapaneseDefinitions, exampleSentences);
+        return new WordDto(id, japaneseWord, englishWord, hiragana, categories, englishDefinitions,
+                newJapaneseDefinitions, exampleSentences);
     }
 
 }

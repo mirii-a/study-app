@@ -3,7 +3,6 @@ package com.japanese.study_app.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
-
 import java.util.Collection;
 import java.util.HashSet;
 
