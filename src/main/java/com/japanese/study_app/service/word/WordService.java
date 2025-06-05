@@ -164,7 +164,6 @@ public class WordService implements IWordService {
     public List<WordDto> getWordsByEnglishWord(String englishWord) {
         List<Word> words = wordRepository.findBySingleEnglishWord(englishWord);
         if (words.isEmpty()) {
-            // this should return 200 empty status?
             throw new WordNotFoundException("No words matching " + englishWord + " found. Please try again.");
         }
         return words.stream().map(wordDtoService::convertWordToDto).collect(Collectors.toList());
