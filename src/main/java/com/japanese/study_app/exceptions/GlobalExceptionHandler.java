@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.io.IOException;
 import java.util.Collections;
 
 @RestControllerAdvice
@@ -64,5 +65,38 @@ public class GlobalExceptionHandler {
                 ex.getMessage()
         );
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiError(Collections.singletonList(errorResponse)));
+    }
+
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler(RandomWordRetrievalException.class)
+    public ResponseEntity<ApiError> randomWordRetrievalException(RandomWordRetrievalException ex) {
+        ErrorResponse errorResponse = new ErrorResponse(
+                "RANDOM_WORD_RETRIEVAL_ERROR",
+                "An error has occurred while retrieving random words. Please resubmit.",
+                ex.getMessage()
+        );
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiError(Collections.singletonList(errorResponse)));
+    }
+
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler(IOException.class)
+    public ResponseEntity<ApiError> ioException(IOException ex) {
+        ErrorResponse errorResponse = new ErrorResponse(
+                "ERROR_WITH_INPUT_OR_OUTPUT",
+                "An error has occurred with input/output. Please resubmit.",
+                ex.getMessage()
+        );
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiError(Collections.singletonList(errorResponse)));
+    }
+
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ApiError> normalException(Exception ex) {
+        ErrorResponse errorResponse = new ErrorResponse(
+                "EXCEPTION_OCCURRED",
+                "An error has occurred. Please resubmit.",
+                ex.getMessage()
+        );
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiError(Collections.singletonList(errorResponse)));
     }
 }
