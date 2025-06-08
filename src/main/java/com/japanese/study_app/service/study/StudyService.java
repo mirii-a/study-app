@@ -1,6 +1,7 @@
 package com.japanese.study_app.service.study;
 
 import com.japanese.study_app.dto.WordDto;
+import com.japanese.study_app.exceptions.RandomWordRetrievalException;
 import com.japanese.study_app.model.Word;
 import com.japanese.study_app.repository.StudyRepository;
 import com.japanese.study_app.service.word.WordDtoService;
@@ -21,31 +22,71 @@ public class StudyService implements IStudyService {
 
     @Override
     public List<WordDto> getRandomWords() {
-        List<Word> randomWords = studyRepository.findRandomWords();
-        return randomWords.stream().map(wordDtoService::convertWordToDto).toList();
+        try {
+            List<Word> randomWords = studyRepository.findRandomWords();
+            return randomWords.stream().map(wordDtoService::convertWordToDto).toList();
+        } catch (Exception e) {
+            throw new RandomWordRetrievalException("Retrieval of random words unsuccessful. Error: " + e.getMessage());
+        }
     }
 
     @Override
     public List<WordDto> getNumberOfRandomWords(Long numberOfWordsToReturn) {
-        List<Word> randomWords = studyRepository.findNumberOfRandomWords(numberOfWordsToReturn);
-        return randomWords.stream().map(wordDtoService::convertWordToDto).toList();
+        try {
+            List<Word> randomWords = studyRepository.findNumberOfRandomWords(numberOfWordsToReturn);
+            return randomWords.stream().map(wordDtoService::convertWordToDto).toList();
+        } catch (Exception e) {
+            throw new RandomWordRetrievalException("Retrieval of " + numberOfWordsToReturn.toString()
+                    + " random words unsuccessful. Error: " + e.getMessage());
+        }
+
     }
 
     @Override
     public List<WordDto> getRandomWordsByCategory(String category) {
-        List<Word> randomWordsByCategory = studyRepository.findNumberOfRandomWordsBasedOnCategory(category, 10L);
-        return randomWordsByCategory.stream().map(wordDtoService::convertWordToDto).toList();
+        try {
+            List<Word> randomWordsByCategory = studyRepository
+                    .findNumberOfRandomWordsBasedOnCategory(category, 10L);
+            return randomWordsByCategory.stream().map(wordDtoService::convertWordToDto).toList();
+        } catch (Exception e) {
+            throw new RandomWordRetrievalException("Retrieval of random words by category " + category
+                    + " unsuccessful. Error: " + e.getMessage());
+        }
     }
 
     @Override
     public List<WordDto> getNumberOfRandomWordsByCategory(String category, Long numberOfWordsToReturn) {
-        List<Word> randomWordsByCategory = studyRepository.findNumberOfRandomWordsBasedOnCategory(category, numberOfWordsToReturn);
-        return randomWordsByCategory.stream().map(wordDtoService::convertWordToDto).toList();
+        try {
+            List<Word> randomWordsByCategory = studyRepository
+                    .findNumberOfRandomWordsBasedOnCategory(category, numberOfWordsToReturn);
+            return randomWordsByCategory.stream().map(wordDtoService::convertWordToDto).toList();
+        } catch (Exception e) {
+            throw new RandomWordRetrievalException("Retrieval of " + numberOfWordsToReturn.toString() +
+                    " random words by category " + category + " unsuccessful. Error: " + e.getMessage());
+        }
     }
 
     @Override
     public List<WordDto> getRandomWordsByEnglishWord(String englishWord) {
-        List<Word> randomWordsByEnglish = studyRepository.findNumberOfRandomWordsBasedOnEnglish(englishWord, 10L);
-        return randomWordsByEnglish.stream().map(wordDtoService::convertWordToDto).toList();
+        try {
+            List<Word> randomWordsByEnglish = studyRepository
+                    .findNumberOfRandomWordsBasedOnEnglish(englishWord, 10L);
+            return randomWordsByEnglish.stream().map(wordDtoService::convertWordToDto).toList();
+        } catch (Exception e) {
+            throw new RandomWordRetrievalException("Retrieval of random words by English word " + englishWord
+                    + " unsuccessful. Error: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public List<WordDto> getNumberOfRandomWordsByEnglishWord(String englishWord, Long numberOfWordsToReturn) {
+        try {
+            List<Word> randomWordsByEnglish = studyRepository
+                    .findNumberOfRandomWordsBasedOnEnglish(englishWord, 10L);
+            return randomWordsByEnglish.stream().map(wordDtoService::convertWordToDto).toList();
+        } catch (Exception e) {
+            throw new RandomWordRetrievalException("Retrieval of " + numberOfWordsToReturn.toString() +
+                    " random words by English word " + englishWord + " unsuccessful. Error: " + e.getMessage());
+        }
     }
 }
