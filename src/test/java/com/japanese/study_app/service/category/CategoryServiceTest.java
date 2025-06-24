@@ -38,7 +38,7 @@ class CategoryServiceTest {
     @Test
     @DisplayName("Should successfully return a CategoryDto by ID")
     void getCategoryDtoById() throws Exception {
-        Category testCategory = getCategory();
+        Category testCategory = getCategoryVerb();
         when(categoryRepository.findById(1L)).thenReturn(Optional.of(testCategory));
 
         when(wordDtoService.convertWordToDto(testCategory.getWords().stream().filter(word -> word.getJapaneseWord().equals("依頼(する)")).findFirst().orElseThrow(() -> new Exception("Test failing due to missing parameters.")))).thenReturn(iraiSuruWordDto());
@@ -71,7 +71,7 @@ class CategoryServiceTest {
     @Test
     @DisplayName("Should successfully return a Category by ID")
     void getCategoryById() {
-        when(categoryRepository.findById(1L)).thenReturn(Optional.of(getCategory()));
+        when(categoryRepository.findById(1L)).thenReturn(Optional.of(getCategoryVerb()));
 
         Category result = categoryService.getCategoryById(1L);
 
@@ -91,11 +91,96 @@ class CategoryServiceTest {
     }
 
     @Test
-    void getCategoryByName() {
+    @DisplayName("Should retrieve Category by name")
+    void getCategoryByName() throws Exception {
+        Category testCategory = getCategoryNoun();
+        when(categoryRepository.findByName("noun")).thenReturn(Optional.of(testCategory));
+
+        when(wordDtoService.convertWordToDto(testCategory.getWords().stream().filter(
+                        word -> word.getJapaneseWord().equals("依頼(する)"))
+                .findFirst()
+                .orElseThrow(
+                        () -> new Exception("Test failing due to missing parameters."))))
+                .thenReturn(iraiSuruWordDto());
+
+        when(wordDtoService.convertWordToDto(testCategory.getWords().stream().filter(
+                        word -> word.getJapaneseWord().equals("隠れる"))
+                .findFirst()
+                .orElseThrow(
+                        () -> new Exception("Test failing due to missing parameters."))))
+                .thenReturn(kakuReRuWordDto());
+
+        CategoryDto result = categoryService.getCategoryByName("noun");
+
+        assertNotNull(result);
+
+        assertTrue(result.words().stream().anyMatch(word -> word.japaneseWord().equals("隠れる")));
+        assertTrue(result.words().stream().anyMatch(word -> word.japaneseWord().equals("依頼(する)")));
+        assertEquals("noun", result.name());
+        assertEquals(2L, result.id());
+        assertEquals(2, result.words().size());
     }
 
     @Test
-    void getAllCategories() {
+    void getAllCategories() throws Exception {
+        Category verb = getCategoryVerb();
+        Category noun = getCategoryNoun();
+        Category hide = getCategoryHide();
+        Category transitive = getCategoryTransitive();
+
+        when(categoryRepository.findAll()).thenReturn(List.of(verb, noun, hide, transitive));
+
+        when(wordDtoService.convertWordToDto(verb.getWords().stream().filter(
+                        word -> word.getJapaneseWord().equals("依頼(する)"))
+                .findFirst()
+                .orElseThrow(
+                        () -> new Exception("Test failing due to missing parameters."))))
+                .thenReturn(iraiSuruWordDto());
+
+        when(wordDtoService.convertWordToDto(verb.getWords().stream().filter(
+                        word -> word.getJapaneseWord().equals("隠れる"))
+                .findFirst()
+                .orElseThrow(
+                        () -> new Exception("Test failing due to missing parameters."))))
+                .thenReturn(kakuReRuWordDto());
+
+        when(wordDtoService.convertWordToDto(noun.getWords().stream().filter(
+                        word -> word.getJapaneseWord().equals("依頼(する)"))
+                .findFirst()
+                .orElseThrow(
+                        () -> new Exception("Test failing due to missing parameters."))))
+                .thenReturn(iraiSuruWordDto());
+
+        when(wordDtoService.convertWordToDto(noun.getWords().stream().filter(
+                        word -> word.getJapaneseWord().equals("隠れる"))
+                .findFirst()
+                .orElseThrow(
+                        () -> new Exception("Test failing due to missing parameters."))))
+                .thenReturn(kakuReRuWordDto());
+
+        when(wordDtoService.convertWordToDto(transitive.getWords().stream().filter(
+                        word -> word.getJapaneseWord().equals("依頼(する)"))
+                .findFirst()
+                .orElseThrow(
+                        () -> new Exception("Test failing due to missing parameters."))))
+                .thenReturn(iraiSuruWordDto());
+
+        when(wordDtoService.convertWordToDto(hide.getWords().stream().filter(
+                        word -> word.getJapaneseWord().equals("隠れる"))
+                .findFirst()
+                .orElseThrow(
+                        () -> new Exception("Test failing due to missing parameters."))))
+                .thenReturn(kakuReRuWordDto());
+
+        List<CategoryDto> result = categoryService.getAllCategories();
+
+        assertNotNull(result);
+        assertEquals(4, result.size());
+        assertTrue(result.stream().anyMatch(category -> category.words().stream().anyMatch(word -> word.japaneseWord().equals("隠れる"))));
+        assertTrue(result.stream().anyMatch(category -> category.name().equals("hide")));
+        assertTrue(result.stream().anyMatch(category -> category.name().equals("transitive")));
+        assertTrue(result.stream().anyMatch(category -> category.name().equals("noun")));
+        assertTrue(result.stream().anyMatch(category -> category.name().equals("verb")));
     }
 
     @Test
@@ -130,12 +215,34 @@ class CategoryServiceTest {
     void removeWordFromCategory() {
     }
 
-    private Category getCategory() {
+    private Category getCategoryVerb() {
         Collection<Word> words = new ArrayList<>();
         words.add(iraiSuruWord());
         words.add(kakuReRuWord());
 
         return new Category(1L, "verb", words);
+    }
+
+    private Category getCategoryNoun() {
+        Collection<Word> words = new ArrayList<>();
+        words.add(iraiSuruWord());
+        words.add(kakuReRuWord());
+
+        return new Category(2L, "noun", words);
+    }
+
+    private Category getCategoryHide() {
+        Collection<Word> words = new ArrayList<>();
+        words.add(kakuReRuWord());
+
+        return new Category(3L, "hide", words);
+    }
+
+    private Category getCategoryTransitive() {
+        Collection<Word> words = new ArrayList<>();
+        words.add(iraiSuruWord());
+
+        return new Category(4L, "transitive", words);
     }
 
     private Word iraiSuruWord() {
