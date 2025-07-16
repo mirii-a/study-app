@@ -25,6 +25,12 @@ class WordDtoServiceTest {
 
         assertThat(result.getClass()).isEqualTo(WordDto.class);
         assertEquals(result.japaneseWord(), stereotype.getJapaneseWord());
+        assertEquals(2, result.englishDefinitions().size());
+        assertEquals(2, result.japaneseDefinitions().size());
+        assertEquals(2, result.categories().size());
+
+        assertTrue(result.englishDefinitions().stream().anyMatch(english -> english.equals("An idea that is always stuck in one's head and restricts one's thinking")));
+        assertTrue(result.japaneseDefinitions().stream().anyMatch(japanese -> japanese.equals("いつも頭から離れないで、その人の思考を拘束するような考え")));
     }
 
 }
