@@ -7,7 +7,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class WordDtoServiceTest {
 
@@ -16,7 +17,9 @@ class WordDtoServiceTest {
     private final TestObjectsWord helper = new TestObjectsWord();
 
     @BeforeEach
-    void setUp() { this.wordDtoService = new WordDtoService();}
+    void setUp() {
+        this.wordDtoService = new WordDtoService();
+    }
 
     @Test
     void convertWordToDto() {
