@@ -1,9 +1,6 @@
 package com.japanese.study_app.testObjects;
 
-import com.japanese.study_app.model.Category;
-import com.japanese.study_app.model.EnglishWord;
-import com.japanese.study_app.model.Word;
-import com.japanese.study_app.model.WordDefinition;
+import com.japanese.study_app.model.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -31,6 +28,29 @@ public class TestObjectsWord {
         wordDefinitions.setWord(koteikannen);
         koteikannen.setDefinitions(wordDefinitions);
 
+        HashSet<ExampleSentence> exampleSentences = getExampleSentences();
+
+        koteikannen.setExampleSentences(exampleSentences);
         return koteikannen;
+    }
+
+    private static HashSet<ExampleSentence> getExampleSentences() {
+        ExampleSentence exampleSentences1 = new ExampleSentence();
+        exampleSentences1.setJapaneseSentence("国民に関する固定観念がどれほど有害かを理解するには、少数の外国人と親しくなるだけで十分だ。");
+        exampleSentences1.setEnglishSentence("One only needs to become acquainted with a small number of foreigners to realise how harmful national stereotypes can be.");
+
+        ExampleSentence exampleSentences2 = new ExampleSentence();
+        exampleSentences2.setJapaneseSentence("年下は年上に敬語を使うべきだというのが、あの世代の固定観念らしい。");
+        exampleSentences2.setEnglishSentence("It seems to be a stereotype of that generation that younger people should use honorific language when speaking to older people.");
+
+        ExampleSentence exampleSentences3 = new ExampleSentence();
+        exampleSentences3.setJapaneseSentence("彼女は男性がより良いリーダーであるという固定観念を打破することを目指している。");
+        exampleSentences3.setEnglishSentence("She aims to break the stereotype that men are better leaders.");
+
+        HashSet<ExampleSentence> exampleSentences = new HashSet<>();
+        exampleSentences.add(exampleSentences1);
+        exampleSentences.add(exampleSentences2);
+        exampleSentences.add(exampleSentences3);
+        return exampleSentences;
     }
 }

@@ -57,9 +57,15 @@ class WordTest {
         assertTrue(word.getEnglishWord().stream().anyMatch(engWord -> engWord.getEnglishWord().equals("fixed idea")));
     }
 
-//    @Test
-//    void getExampleSentences() {
-//    }
+    @Test
+    void getExampleSentences() {
+        assertTrue(word.getExampleSentences().stream().anyMatch(sentence -> sentence.getJapaneseSentence().equals("国民に関する固定観念がどれほど有害かを理解するには、少数の外国人と親しくなるだけで十分だ。")));
+        assertTrue(word.getExampleSentences().stream().anyMatch(sentence -> sentence.getJapaneseSentence().equals("年下は年上に敬語を使うべきだというのが、あの世代の固定観念らしい。")));
+        assertTrue(word.getExampleSentences().stream().anyMatch(sentence -> sentence.getJapaneseSentence().equals("彼女は男性がより良いリーダーであるという固定観念を打破することを目指している。")));
+        assertTrue(word.getExampleSentences().stream().anyMatch(sentence -> sentence.getEnglishSentence().equals("One only needs to become acquainted with a small number of foreigners to realise how harmful national stereotypes can be.")));
+        assertTrue(word.getExampleSentences().stream().anyMatch(sentence -> sentence.getEnglishSentence().equals("It seems to be a stereotype of that generation that younger people should use honorific language when speaking to older people.")));
+        assertTrue(word.getExampleSentences().stream().anyMatch(sentence -> sentence.getEnglishSentence().equals("She aims to break the stereotype that men are better leaders.")));
+    }
 
     @Test
     void getDefinitions() {
